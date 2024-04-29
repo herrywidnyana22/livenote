@@ -1,9 +1,9 @@
 import { Info } from "@/components/info"
 import { cn } from "@/lib/utils"
-import { Check, Loader, Loader2, Save, Star, Trash, X } from "lucide-react"
+import { Loader2, Save, Star, X } from "lucide-react"
 import { Input } from "../input"
 import { Button } from "@/components/ui/button"
-import { FormEventHandler, useState } from "react"
+import { useState } from "react"
 import { useHookMutation } from "@/hooks/useMutation"
 import { api } from "@/convex/_generated/api"
 import { toast } from "sonner"
@@ -31,7 +31,6 @@ export const FooterCard = ({
     setEditedData
 }: FooterCardProps) => {
     const [value, setValue] = useState("")
-    const [testing, setTesting] = useState("")
 
     const { mutate: updateMutate, isPending: updateIsPending } = useHookMutation(api.board.update);
     const { mutate: favMutate, isPending: favIsPending } = useHookMutation(api.board.fav);

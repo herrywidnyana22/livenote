@@ -92,6 +92,20 @@ export const remove = mutation({
 
         if(!userIdentity) throw new Error ("Not authenticated...!")
 
+        const userID = userIdentity.subject
+
+        const existFav = await ctx.db
+            .query("userFav")
+            .withIndex("by_user_board", (query) => query
+                .eq("userID", userID)
+                .eq("boardID", args.id)
+            )
+            .unique()
+            
+        if(existFav){
+            await ctx.db.delete(existFav._id)
+        }   
+
         await ctx.db.delete(args.id)
     }
 })
