@@ -9,6 +9,7 @@ import { FooterCard } from "./footerCard"
 import { Skeleton } from "@/components/ui/skeleton"
 import Actions from "@/components/actions"
 import { MoreHorizontal } from "lucide-react"
+import { useState } from "react"
 
 interface BoardCardProps{
     id: string
@@ -19,6 +20,8 @@ interface BoardCardProps{
     userName: string
     createdAt: number
     isFav: boolean
+    editedData: any, 
+    setEditedData: any
 }
 export const BoardCard = ({
     id,
@@ -28,8 +31,11 @@ export const BoardCard = ({
     userName,
     createdAt,
     orgID,
-    isFav
+    isFav,
+    editedData, 
+    setEditedData
 }: BoardCardProps) => {
+       
     const { userId } = useAuth()
     const authorLabel = userId === userID 
     ? "You"
@@ -40,7 +46,8 @@ export const BoardCard = ({
     })
     return ( 
         <Link
-            href={`/board?id=${id}`}
+            href={{}}
+            // href={`/board?id=${id}`}
         >
             <div
                 className="
@@ -74,8 +81,10 @@ export const BoardCard = ({
                         id={id}
                         title={title}
                         side="right"
+                        setEditedData={setEditedData}
                     >
                         <button
+                            type="button"
                             className="
                                 absolute
                                 top-1
@@ -100,12 +109,15 @@ export const BoardCard = ({
                     </Actions>
                 </div>
                 <FooterCard
+                    id={id}
                     title={title}
                     authorLabel={authorLabel}
                     timeCreatedLabel={timeCreatedLabel}
                     isFav= {isFav}
                     onClick=  {() => {}}
                     disabled
+                    editedData={editedData}
+                    setEditedData={setEditedData}
                 />
             </div>
         </Link>

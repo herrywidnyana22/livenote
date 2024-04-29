@@ -7,6 +7,8 @@ import EmptyFavoriteState from "./state/emptyFavoriteState"
 import EmptySearchState from "./state/emptySearchState"
 import { BoardCard } from "./card/boardCard"
 import { NewBoard } from "./newBoard"
+import { useState } from "react"
+import { useHookMutation } from "@/hooks/useMutation"
 
 type BoardListProps = {
     orgID: string
@@ -16,7 +18,8 @@ type BoardListProps = {
     }
 }
 export const BoardList = ({orgID, query}: BoardListProps) => {
-    const data = useQuery(api.boards.get, {orgID})
+    const [editedData, setEditedData] = useState("")
+    const data = useQuery(api.board.getAll, {orgID})
     // if(data === undefined){
     //     return(
     //         <div>
@@ -118,6 +121,8 @@ export const BoardList = ({orgID, query}: BoardListProps) => {
                             createdAt={boardItem._creationTime}
                             orgID={boardItem.orgID}
                             isFav={ false }
+                            editedData={editedData}
+                            setEditedData={setEditedData}
                         />
                     ))
                 }

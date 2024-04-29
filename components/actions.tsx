@@ -2,7 +2,7 @@
 
 import { DropdownMenuContentProps } from "@radix-ui/react-dropdown-menu"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Link2, Trash2 } from "lucide-react"
+import { Link2, Pencil, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import { useHookMutation } from "@/hooks/useMutation"
 import { api } from "@/convex/_generated/api"
@@ -15,6 +15,7 @@ interface ActionProps{
     children: React.ReactNode
     side?: DropdownMenuContentProps["side"]
     sideOffset?: DropdownMenuContentProps["sideOffset"]
+    setEditedData?: any
 }
 
 const Actions = ({
@@ -23,9 +24,10 @@ const Actions = ({
     children,
     side,
     sideOffset,
+    setEditedData
 }: ActionProps) => {
 
-    const { mutate, isPending } = useHookMutation(api.removeBoard.remove)
+    const { mutate, isPending } = useHookMutation(api.board.remove)
 
     const copyLink = () =>{
         navigator.clipboard.writeText(
@@ -40,6 +42,10 @@ const Actions = ({
         .then(() => toast.success("Board deleted..."))
         .catch(() => toast.error("Failed to delete board..!"))
         
+    }
+
+    const onRename = () =>{
+        setEditedData(id)
     }
 
     return ( 
@@ -69,6 +75,22 @@ const Actions = ({
                     />
                     Copy board link
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                    onClick={onRename}
+                    className="
+                        p-3
+                        cursor-pointer
+                    "
+                >
+                    <Pencil
+                        className="
+                            w-4
+                            h-4
+                            mr-2
+                        "
+                    />
+                    Rename this board
+                </DropdownMenuItem>
                 <AlertModal
                     title="Delete this board?"
                     desc="This will delete the board and all of its contents"
@@ -96,6 +118,7 @@ const Actions = ({
                         Delete this board
                     </Button>
                 </AlertModal>
+               
             </DropdownMenuContent>
         </DropdownMenu>
     );

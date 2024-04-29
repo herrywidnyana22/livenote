@@ -12,7 +12,7 @@ interface NewBoardProps{
 }
 export const NewBoard = ({orgID, disabled}: NewBoardProps) => {
 
-    const {mutate, isPending} = useHookMutation(api.createBoard.create)
+    const {mutate, isPending} = useHookMutation(api.board.create)
 
     const handleNewClick = () => {
         mutate({
