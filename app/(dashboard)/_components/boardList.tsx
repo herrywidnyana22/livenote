@@ -120,7 +120,7 @@ export const BoardList = ({orgID, query}: BoardListProps) => {
                             userName={boardItem.authorName}
                             createdAt={boardItem._creationTime}
                             orgID={boardItem.orgID}
-                            isFav={ false }
+                            isFav={ boardItem.isFav }
                             editedData={editedData}
                             setEditedData={setEditedData}
                         />

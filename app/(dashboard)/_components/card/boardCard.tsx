@@ -110,12 +110,11 @@ export const BoardCard = ({
                 </div>
                 <FooterCard
                     id={id}
+                    orgID={orgID}
                     title={title}
                     authorLabel={authorLabel}
                     timeCreatedLabel={timeCreatedLabel}
                     isFav= {isFav}
-                    onClick=  {() => {}}
-                    disabled
                     editedData={editedData}
                     setEditedData={setEditedData}
                 />

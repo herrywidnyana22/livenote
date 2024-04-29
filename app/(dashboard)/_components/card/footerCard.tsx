@@ -10,42 +10,52 @@ import { toast } from "sonner"
 
 interface FooterCardProps{
     id: string
+    orgID: string
     title: string
     authorLabel: string
     timeCreatedLabel: string
     isFav: boolean
-    disabled: boolean
-    onClick: () => void
     editedData?: string
     setEditedData?: any
 }
 
+
 export const FooterCard = ({
     id,
+    orgID,
     title,
     authorLabel,
     timeCreatedLabel,
     isFav,
-    disabled,
-    onClick,
     editedData,
     setEditedData
 }: FooterCardProps) => {
     const [value, setValue] = useState("")
     const [testing, setTesting] = useState("")
 
-    const {mutate, isPending } = useHookMutation(api.board.update)
+    const { mutate: updateMutate, isPending: updateIsPending } = useHookMutation(api.board.update);
+    const { mutate: favMutate, isPending: favIsPending } = useHookMutation(api.board.fav);
+    const { mutate: unFavMutate, isPending: unFavIsPending } = useHookMutation(api.board.unFav);
 
     const onCancel = () =>{
         setEditedData("")
         setValue("")
     }
 
-    const onSubmit = () =>{
-        setTesting(id)
-        
+    const onFav = () =>{
+        if(isFav){
+            unFavMutate({id})
+            .catch(()=> toast.error("Failed to unfavorite this board"))
+        }
+        else{
+            favMutate({id, orgID})
+            .catch(()=> toast.error("Failed to favorite this board"))
+        }
+    }
 
-        mutate({
+    const onSubmit = () =>{        
+
+        updateMutate({
             id,
             title: value
         })
@@ -77,7 +87,7 @@ export const FooterCard = ({
                     value={value}
                     label={title}
                     onChange={(e) => setValue(e.target.value)}
-                    disabled={isPending}
+                    disabled={updateIsPending}
                     readOnly={!(editedData === id && editedData !== "")}
                 />               
                 <p
@@ -113,13 +123,13 @@ export const FooterCard = ({
                                 sideOffset={5}
                             >
                                 <button
-                                    disabled={disabled}
-                                    onClick={onClick}
+                                    disabled={favIsPending || unFavIsPending}
+                                    onClick={onFav}
                                     className={cn(`                        
                                         transition
                                         text-muted-foreground
                                         hover:text-blue-600`,
-                                        disabled && "cursor-not-allowed opacity-75"
+                                        favIsPending || unFavIsPending && "cursor-not-allowed opacity-75"
                                     )}
                                 >
                                         
@@ -150,11 +160,11 @@ export const FooterCard = ({
                                 onClick={onSubmit}
                                 variant={"secondary"}
                                 size={"sm"}
-                                disabled={isPending || value === ""}
+                                disabled={updateIsPending || value === ""}
                                 className="p-2"
                             >
                                 {
-                                    isPending 
+                                    updateIsPending 
                                     ?   (
                                             <Loader2
                                              className="
@@ -182,7 +192,7 @@ export const FooterCard = ({
                                 onClick={onCancel}
                                 variant={"secondary"}
                                 size={"sm"}
-                                disabled={isPending}
+                                disabled={updateIsPending}
                                 className="p-2"
                             >
                                 <X

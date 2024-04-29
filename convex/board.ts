@@ -34,7 +34,25 @@ export const getAll = query({
         .order("desc")
         .collect()
 
-        return getAllBoard
+        const favBoards = getAllBoard.map((boardItem) => {
+            return ctx.db
+            .query("userFav")
+            .withIndex("by_user_board", (query) => query
+                .eq("userID", userIdentity.subject)
+                .eq("boardID", boardItem._id)
+            )
+            .unique()
+            .then((fav) => {
+                return{
+                    ...boardItem,
+                    isFav: !!fav
+                }
+            })
+        })
+
+        const favBoardBoolean = Promise.all(favBoards)
+
+        return favBoardBoolean
     }
 })
 
@@ -79,7 +97,11 @@ export const remove = mutation({
 })
 
 export const update =  mutation({
-    args: {id: v.id("boards"), title: v.string()},
+    args: {
+        id: v.id("boards"), 
+        title: v.string()
+    },
+
     handler: async (ctx, args) =>{
         const userIdentity = await ctx.auth.getUserIdentity()
 
@@ -94,5 +116,75 @@ export const update =  mutation({
         const board = await ctx.db.patch(args.id,{
             title: args.title
         })
+    }
+})
+
+export const unFav = mutation({
+    args: {
+        id: v.id("boards")
+    },
+    handler: async (ctx, args) =>{
+        const userIdentity = await ctx.auth.getUserIdentity()
+
+        if(!userIdentity) throw new Error ("Not authenticated...!")
+
+        const board = await ctx.db.get(args.id)
+
+        if(!board) throw new Error("Board not found")
+
+        const IDUser = userIdentity.subject
+
+        const existFav = await ctx.db
+            .query("userFav")
+            .withIndex("by_user_board", (query) => 
+                query
+                .eq("userID", IDUser)
+                .eq( "boardID", board._id)
+            )
+            .unique()
+
+        if (!existFav) throw new Error("Favorited board not found..")
+        
+        await ctx.db.delete(existFav._id)
+
+        return board
+    }
+})
+
+export const fav = mutation({
+    args: {
+        id: v.id("boards"), 
+        orgID: v.string()
+    },
+    handler: async (ctx, args) =>{
+        const userIdentity = await ctx.auth.getUserIdentity()
+
+        if(!userIdentity) throw new Error ("Not authenticated...!")
+
+        const board = await ctx.db.get(args.id)
+
+        if(!board) throw new Error("Board not found")
+
+        const IDUser = userIdentity.subject
+
+        const existFav = await ctx.db
+            .query("userFav")
+            .withIndex("by_user_board_org", (query) => 
+                query
+                .eq("userID", IDUser)
+                .eq( "boardID", board._id)
+                .eq("orgID", args.orgID)
+            )
+            .unique()
+
+        if (existFav) throw new Error("Board already favorited..")
+        
+        await ctx.db.insert("userFav", {
+            userID: IDUser,
+            boardID: board._id,
+            orgID: args.orgID
+        })
+
+        return board
     }
 })
