@@ -43,7 +43,7 @@ export const OrgSidebar = () => {
                     "
                 >
                     <Image
-                        src={"/logo.png"}
+                        src={"/logo.svg"}
                         alt="logo"
                         width={36}
                         height={36}

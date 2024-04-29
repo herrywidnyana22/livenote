@@ -14,7 +14,7 @@ export const Loading = () => {
             "
         >
             <Image
-                src={"/logo.png"}
+                src={"/logo.svg"}
                 alt="Logo"
                 width={120}
                 height={120}
