@@ -26,7 +26,7 @@ export const Input = ({
     onChange,
 }: InputProps) => {
     return ( 
-        <div className="z-99">
+        <div className="z-99 w-full">
              <input
                     id={id}
                     name={name}
@@ -38,8 +38,8 @@ export const Input = ({
                     onChange={onChange}
                     className={cn(`
                         appearance-none
-                        max-w-[calc(100%-50px)]
                         text-sm
+                        w-full
                         truncate
                         peer
                         p-1
@@ -57,7 +57,7 @@ export const Input = ({
                         className,
                         disabled && "opacity-80 cursor-not-allowed",
                         readOnly 
-                        ? "px-0 ring-0 shadow-none border-transparent bg-transparent"
+                        ? "w-10 px-0 ring-0 shadow-none border-transparent bg-transparent"
                         : "shadow-sm",
                         
                     )}
@@ -65,7 +65,7 @@ export const Input = ({
                 {/* {   !readOnly &&( */}
                     <label className={cn(`
                         absolute
-                        top-[22px]
+                        top-[20px]
                         left-2
                         px-1
                         text-sm
@@ -76,13 +76,13 @@ export const Input = ({
                         !readOnly 
                         && `
                             left-5
-                            -translate-y-5
+                            -translate-y-4
                             bg-white
                             pointer-events-none
                             peer-placeholder-shown:scale-100
                             peer-placeholder-shown:translate-y-0
-                            peer-focus:scale-75
-                            peer-focus:-translate-y-5
+                            peer-focus:scale-90
+                            peer-focus:-translate-y-4
                         `,
                         className  
                     )}>

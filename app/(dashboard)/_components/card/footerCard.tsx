@@ -1,9 +1,12 @@
 import { Info } from "@/components/info"
 import { cn } from "@/lib/utils"
-import { Check, Save, Star, Trash, X } from "lucide-react"
+import { Check, Loader, Loader2, Save, Star, Trash, X } from "lucide-react"
 import { Input } from "../input"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { FormEventHandler, useState } from "react"
+import { useHookMutation } from "@/hooks/useMutation"
+import { api } from "@/convex/_generated/api"
+import { toast } from "sonner"
 
 interface FooterCardProps{
     id: string
@@ -29,20 +32,43 @@ export const FooterCard = ({
     setEditedData
 }: FooterCardProps) => {
     const [value, setValue] = useState("")
+    const [testing, setTesting] = useState("")
+
+    const {mutate, isPending } = useHookMutation(api.board.update)
+
     const onCancel = () =>{
         setEditedData("")
         setValue("")
     }
+
+    const onSubmit = () =>{
+        setTesting(id)
+        
+
+        mutate({
+            id,
+            title: value
+        })
+        .then(() => {
+            toast.success("Board renamed...")
+            setEditedData("")
+            setValue("")
+        })
+        .catch(() => toast.error("Failed to rename board..."))
+    }
+
     return ( 
+       
         <div
             className="
                 relative
                 flex
+                gap-1
                 justify-between
-                items-center
                 p-3
             "
         >
+           
             <div>
                 <Input
                     id={id}
@@ -51,7 +77,7 @@ export const FooterCard = ({
                     value={value}
                     label={title}
                     onChange={(e) => setValue(e.target.value)}
-                    // disabled={disabled}
+                    disabled={isPending}
                     readOnly={!(editedData === id && editedData !== "")}
                 />               
                 <p
@@ -67,91 +93,112 @@ export const FooterCard = ({
                     {authorLabel}, {timeCreatedLabel}
                 </p>
             </div>
-            {
-                editedData !== id
-                && (
+            <div className="relative">
+                {
+                    editedData !== id
+                    && (
+                        <div
+                            className="
+                                h-full
+                                flex
+                                items-center
+                                opacity-0
+                                group-hover:opacity-100
+                            "
+                        >
+                            <Info
+                                label={isFav ? "Your favorite board" : "Add to favorite"}
+                                side="top"
+                                align="center"
+                                sideOffset={5}
+                            >
+                                <button
+                                    disabled={disabled}
+                                    onClick={onClick}
+                                    className={cn(`                        
+                                        transition
+                                        text-muted-foreground
+                                        hover:text-blue-600`,
+                                        disabled && "cursor-not-allowed opacity-75"
+                                    )}
+                                >
+                                        
+                                    <Star
+                                        className={cn(`
+                                            w-5
+                                            h-5`,
+                                            isFav && "fill-blue-600 text-blue-600"
+                                        )}
+                                    />
+                                        
+                                    
+                                </button>
+                            </Info>
+                        </div>
+                    )
+                }
+                {
+                    (editedData === id && editedData !== "") &&
                     <div
-                    className="
-                        opacity-0
-                        group-hover:opacity-100
-                    "
-                    >
-                    <Info
-                        label={isFav ? "Your favorite board" : "Add to favorite"}
-                        side="top"
-                        align="center"
-                        sideOffset={5}
-                    >
-                        <button
-                            disabled={disabled}
-                            onClick={onClick}
-                            className={cn(`                        
-                                transition
-                                text-muted-foreground
-                                hover:text-blue-600`,
-                                disabled && "cursor-not-allowed opacity-75"
-                            )}
-                        >
+                        className="
+                            flex
+                            gap-1
+                        "
+                    >   
+                        <Info label="Simpan">
+                            <Button
+                                onClick={onSubmit}
+                                variant={"secondary"}
+                                size={"sm"}
+                                disabled={isPending || value === ""}
+                                className="p-2"
+                            >
+                                {
+                                    isPending 
+                                    ?   (
+                                            <Loader2
+                                             className="
+                                                w-3
+                                                h-3
+                                                text-green-800
+                                                animate-spin
+                                            "
+                                            />
+                                        )
+                                    :   (<Save
+                                        className="
+                                            w-3
+                                            h-3
+                                            text-green-800
+                                        "
+                                    />)
+                                }
                                 
-                            <Star
-                                className={cn(`
-                                    w-5
-                                    h-5`,
-                                    isFav && "fill-blue-600 text-blue-600"
-                                )}
-                            />
-                                
-                            
-                        </button>
-                    </Info>
+                            </Button>
+                        </Info>
+                        
+                        <Info label="Cancel">
+                            <Button
+                                onClick={onCancel}
+                                variant={"secondary"}
+                                size={"sm"}
+                                disabled={isPending}
+                                className="p-2"
+                            >
+                                <X
+                                    className="
+                                        w-3
+                                        h-3
+                                        text-rose-600
+                                    "
+                                />
+                            </Button>
+                        </Info>
+                        
                     </div>
-                )
-            }
-            {
-                (editedData === id && editedData !== "") &&
-                <div
-                    className="
-                        absolute
-                        right-2
-                        top-3
-                        flex
-                        gap-1
-                    "
-                >   
-                    <Info label="Simpan">
-                        <Button
-                            type="submit"
-                            variant={"secondary"}
-                            size={"sm"}
-                        >
-                            <Save
-                                className="
-                                    w-3
-                                    h-3
-                                    text-green-800
-                                "
-                            />
-                        </Button>
-                    </Info>
-                    
-                    <Info label="Cancel">
-                        <Button
-                            variant={"secondary"}
-                            size={"sm"}
-                            onClick={onCancel}
-                        >
-                            <X
-                                className="
-                                    w-3
-                                    h-3
-                                    text-rose-600
-                                "
-                            />
-                        </Button>
-                    </Info>
-                    
-                </div>
-            }
+                }
+
+            </div>
         </div>
     );
 }

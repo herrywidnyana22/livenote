@@ -18,6 +18,26 @@ const images = [
     "/sample/13.svg",
 ]
 
+
+export const getAll = query({
+    args:{
+        orgID: v.string()
+    },
+    handler: async(ctx, args) =>{
+        const userIdentity = await ctx.auth.getUserIdentity()
+
+        if(!userIdentity) throw new Error("Not authenticated...!")
+
+        const getAllBoard = await ctx.db
+        .query("boards")
+        .withIndex("by_org", (q) => q.eq("orgID",args.orgID))
+        .order("desc")
+        .collect()
+
+        return getAllBoard
+    }
+})
+
 export const create = mutation({
     args:{
         orgID: v.string(),
@@ -58,21 +78,21 @@ export const remove = mutation({
     }
 })
 
-export const getAll = query({
-    args:{
-        orgID: v.string()
-    },
-    handler: async(ctx, args) =>{
+export const update =  mutation({
+    args: {id: v.id("boards"), title: v.string()},
+    handler: async (ctx, args) =>{
         const userIdentity = await ctx.auth.getUserIdentity()
 
-        if(!userIdentity) throw new Error("Not authenticated...!")
+        if(!userIdentity) throw new Error ("Not authenticated...!")
 
-        const getAllBoard = await ctx.db
-        .query("boards")
-        .withIndex("by_org", (q) => q.eq("orgID",args.orgID))
-        .order("desc")
-        .collect()
+        const title = args.title.trim()
 
-        return getAllBoard
+        if(!title) throw new Error("Title is required")
+
+        if(title.length > 60) throw new Error("Title must have more than 60 characters")   
+
+        const board = await ctx.db.patch(args.id,{
+            title: args.title
+        })
     }
 })
