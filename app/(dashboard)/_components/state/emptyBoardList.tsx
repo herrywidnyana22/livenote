@@ -5,12 +5,15 @@ import { useOrganization } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 const EmptyBoardListState = () => {
 
     const {mutate, isPending} = useHookMutation(api.board.create)
     const {organization} = useOrganization()
+
+    const router = useRouter()
 
     const createBoard = () =>{
         if (!organization) return
@@ -21,6 +24,7 @@ const EmptyBoardListState = () => {
         })
         .then((id) =>{
             toast.success("Board created...")
+            router.push(`/board/${id}`)
         })
         .catch(() => toast.error("Failed to create board"))
     }

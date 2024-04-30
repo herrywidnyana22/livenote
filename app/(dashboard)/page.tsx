@@ -7,7 +7,7 @@ import { BoardList } from "./_components/boardList";
 interface DashboardProps{
     searchParams:{
         search?: string
-        favorites?: string
+        fav?: string
     }
 }
 

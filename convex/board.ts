@@ -1,6 +1,7 @@
 import { v } from "convex/values"
 import { mutation } from "./_generated/server"
 import { query } from "./_generated/server";
+import { getAllOrThrow } from "convex-helpers/server/relationships"
 
 const images = [
     "/sample/1.svg",
@@ -21,18 +22,59 @@ const images = [
 
 export const getAll = query({
     args:{
-        orgID: v.string()
+        orgID: v.string(),
+        search: v.optional(v.string()),
+        fav: v.optional(v.string())
     },
     handler: async(ctx, args) =>{
         const userIdentity = await ctx.auth.getUserIdentity()
 
         if(!userIdentity) throw new Error("Not authenticated...!")
 
-        const getAllBoard = await ctx.db
-        .query("boards")
-        .withIndex("by_org", (q) => q.eq("orgID",args.orgID))
-        .order("desc")
-        .collect()
+        if(args.fav){
+            const favBoard = await ctx.db
+                .query("userFav")
+                .withIndex("by_user_org", (query) => query
+                    .eq("userID", userIdentity.subject)
+                    .eq("orgID", args.orgID)
+                )
+                .order("desc")
+                .collect()
+
+            const favoritedBoard = favBoard.map((boardItem) => boardItem.boardID)
+
+            const boards = await getAllOrThrow(ctx.db, favoritedBoard)
+
+            return boards.map((boardItem) =>({
+                ...boardItem,
+                isFav: true
+            }))
+        }
+
+        
+        const title = args.search as string
+        let getAllBoard= []
+
+        if (title){
+            getAllBoard = await ctx.db
+                .query("boards")
+                .withSearchIndex("search_title", (query) => query
+                    .search("title", title)
+                    .eq("orgID", args.orgID)
+                )
+                .collect()
+        }
+        else{
+            getAllBoard = await ctx.db
+                .query("boards")
+                .withIndex("by_org", (q) => q.eq("orgID",args.orgID))
+                .order("desc")
+                .collect()
+        }
+
+       
+
+        
 
         const favBoards = getAllBoard.map((boardItem) => {
             return ctx.db
@@ -101,7 +143,7 @@ export const remove = mutation({
                 .eq("boardID", args.id)
             )
             .unique()
-            
+
         if(existFav){
             await ctx.db.delete(existFav._id)
         }   
@@ -183,11 +225,10 @@ export const fav = mutation({
 
         const existFav = await ctx.db
             .query("userFav")
-            .withIndex("by_user_board_org", (query) => 
+            .withIndex("by_user_board", (query) => 
                 query
                 .eq("userID", IDUser)
                 .eq( "boardID", board._id)
-                .eq("orgID", args.orgID)
             )
             .unique()
 

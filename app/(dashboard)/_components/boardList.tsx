@@ -1,64 +1,71 @@
 'use client'
 
-import { useQuery } from "convex/react"
-import { api } from "@/convex/_generated/api"
 import EmptyBoardListState from "./state/emptyBoardList"
 import EmptyFavoriteState from "./state/emptyFavoriteState"
 import EmptySearchState from "./state/emptySearchState"
+import { useQuery } from "convex/react"
+import { api } from "@/convex/_generated/api"
 import { BoardCard } from "./card/boardCard"
 import { NewBoard } from "./newBoard"
 import { useState } from "react"
-import { useHookMutation } from "@/hooks/useMutation"
 
 type BoardListProps = {
     orgID: string
     query:{
         search?: string
-        favorites?: string
+        fav?: string
     }
 }
 export const BoardList = ({orgID, query}: BoardListProps) => {
     const [editedData, setEditedData] = useState("")
-    const data = useQuery(api.board.getAll, {orgID})
-    // if(data === undefined){
-    //     return(
-    //         <div>
-    //             <h2
-    //                 className="
-    //                     text-3xl
-    //                 "
-    //             >
-    //                 {
-    //                     query.favorites 
-    //                     ? "Favorite boards"
-    //                     : "Team Boards"
-    //                 }
-    //             </h2>
-    //             <div
-    //                 className="
-    //                     grid
-    //                     grid-cols-1
-    //                     gap-5
-    //                     mt-8
-    //                     pb-10
-    //                     sm:grid-cols-2
-    //                     md:grid-cols-4
-    //                     lg:grid-cols-4
-    //                     xl:grid-cols-5
-    //                     2xl:grid-cols-6
-    //                 "
-    //             >
-    //                 <NewBoard
-    //                     orgID={orgID}
-    //                     disabled
-    //                 />
-    //                 {
-    //                     data?.map((item) => <BoardCard.Skeleton key={item._id}/>)
-    //                 }
-    //             </div>
-    //         </div>
-    //     )
-    // }
+    const data = useQuery(api.board.getAll, {
+        orgID, 
+        ...query
+    })
+    if(data === undefined){
+        return(
+            <div>
+                <h2
+                    className="
+                        text-3xl
+                    "
+                >
+                    {
+                        query.fav 
+                        ? "Favorite boards"
+                        : "Team Boards"
+                    }
+                </h2>
+                <div
+                    className="
+                        grid
+                        grid-cols-1
+                        gap-5
+                        mt-8
+                        pb-10
+                        sm:grid-cols-2
+                        md:grid-cols-4
+                        lg:grid-cols-4
+                        xl:grid-cols-5
+                        2xl:grid-cols-6
+                    "
+                >
+                    <NewBoard
+                        orgID={orgID}
+                        disabled
+                    />
+                    <BoardCard.Skeleton/>
+                    <BoardCard.Skeleton/>
+                    <BoardCard.Skeleton/>
+                    <BoardCard.Skeleton/>
+                    <BoardCard.Skeleton/>
+                    {/* {
+                        data?.map((item) => <BoardCard.Skeleton key={item._id}/>)
+                    } */}
+                </div>
+            </div>
+        )
+    }
 
     if (query.search && !data?.length){
         return(
@@ -66,7 +73,7 @@ export const BoardList = ({orgID, query}: BoardListProps) => {
         )
     }
 
-    if (query.favorites && !data?.length){
+    if (query.fav && !data?.length){
         return(
             <EmptyFavoriteState/>
         )
@@ -86,7 +93,7 @@ export const BoardList = ({orgID, query}: BoardListProps) => {
                 "
             >
                 {
-                    query.favorites 
+                    query.fav 
                     ? "Favorite boards"
                     : "Team Boards"
                 }
@@ -105,10 +112,13 @@ export const BoardList = ({orgID, query}: BoardListProps) => {
                     2xl:grid-cols-6
                 "
             >
-                <NewBoard
-                    orgID={orgID}
-                    disabled={false}
-                />
+                {
+                    !query.fav &&  
+                    <NewBoard
+                        orgID={orgID}
+                        disabled={false}
+                    />
+                }
                 {
                     data?.map((boardItem) =>(
                         <BoardCard

@@ -18,7 +18,7 @@ const font = Poppins({
 export const OrgSidebar = () => {
 
     const searchParams = useSearchParams()
-    const favorites = searchParams.get("favorites")
+    const favorites = searchParams.get("fav")
 
     return ( 
         <div
@@ -122,7 +122,7 @@ export const OrgSidebar = () => {
                 >
                     <Link href={{
                         pathname: "/",
-                        query: {favorites: true}
+                        query: {fav: true}
                     }}>
                         <Star
                             className="
