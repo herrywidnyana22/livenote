@@ -1,6 +1,5 @@
 import { v } from "convex/values"
-import { mutation } from "./_generated/server"
-import { query } from "./_generated/server";
+import { mutation, query } from "./_generated/server"
 import { getAllOrThrow } from "convex-helpers/server/relationships"
 
 const images = [
@@ -18,7 +17,6 @@ const images = [
     "/sample/12.svg",
     "/sample/13.svg",
 ]
-
 
 export const getAll = query({
     args:{
@@ -72,10 +70,6 @@ export const getAll = query({
                 .collect()
         }
 
-       
-
-        
-
         const favBoards = getAllBoard.map((boardItem) => {
             return ctx.db
             .query("userFav")
@@ -97,6 +91,19 @@ export const getAll = query({
         return favBoardBoolean
     }
 })
+
+
+export const getByID = query({
+    args:{ 
+        id: v.id("boards")
+    },
+    handler: async(ctx, args) => {
+        const board = await ctx.db.get(args.id)
+
+        return board
+    }
+})
+
 
 export const create = mutation({
     args:{
@@ -243,3 +250,4 @@ export const fav = mutation({
         return board
     }
 })
+

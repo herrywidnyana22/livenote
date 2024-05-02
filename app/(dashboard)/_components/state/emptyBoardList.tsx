@@ -23,7 +23,7 @@ const EmptyBoardListState = () => {
             title: "Untitled",
         })
         .then((id) =>{
-            toast.success("Board created...")
+            toast.success("Board created, redirect to board...")
             router.push(`/board/${id}`)
         })
         .catch(() => toast.error("Failed to create board"))

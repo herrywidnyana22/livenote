@@ -45,10 +45,7 @@ export const BoardCard = ({
         addSuffix: true
     })
     return ( 
-        <Link
-            href={{}}
-            // href={`/board?id=${id}`}
-        >
+        
             <div
                 className="
                     group
@@ -61,53 +58,57 @@ export const BoardCard = ({
                     overflow-hidden
                 "
             >
-                <div
-                    className="
-                        relative
-                        flex-1
-                        bg-amber-50
-                    "
-                >
-                    <Image
-                        src={imageURL}
-                        alt="Board Image"
-                        fill
+                
+                    <div
                         className="
-                            object-fit
+                            relative
+                            flex-1
+                            bg-amber-50
                         "
-                    />
-                    <OverlayEffect/>
-                    <Actions
-                        id={id}
-                        title={title}
-                        side="right"
-                        setEditedData={setEditedData}
                     >
-                        <button
-                            type="button"
-                            className="
-                                absolute
-                                top-1
-                                right-1
-                                px-3
-                                py-2
-                                opacity-0
-                                group-hover:opacity-100
-                                transition-opacity
-                                outline-none
-                            "
+                        <Link
+                            href={`/board/${id}`}
                         >
-                            <MoreHorizontal
+                            <Image
+                                src={imageURL}
+                                alt="Board Image"
+                                fill
                                 className="
-                                    opacity-75
-                                    hover:opacity-100
-                                    transition-opacity
-                                    text-white
+                                    object-fit
                                 "
                             />
-                        </button>
-                    </Actions>
-                </div>
+                            <OverlayEffect/>
+                            <Actions
+                                id={id}
+                                side="right"
+                                setEditedData={setEditedData}
+                            >
+                                <button
+                                    type="button"
+                                    className="
+                                        absolute
+                                        top-1
+                                        right-1
+                                        px-3
+                                        py-2
+                                        opacity-0
+                                        group-hover:opacity-100
+                                        transition-opacity
+                                        outline-none
+                                    "
+                                >
+                                    <MoreHorizontal
+                                        className="
+                                            opacity-75
+                                            hover:opacity-100
+                                            transition-opacity
+                                            text-white
+                                        "
+                                    />
+                                </button>
+                            </Actions>
+                        </Link>
+                    </div>
                 <FooterCard
                     id={id}
                     orgID={orgID}
@@ -119,7 +120,6 @@ export const BoardCard = ({
                     setEditedData={setEditedData}
                 />
             </div>
-        </Link>
     );
 }
 

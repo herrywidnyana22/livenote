@@ -23,21 +23,21 @@ export const Input = ({
     disabled,
     readOnly,
     className, 
-    onChange,
+    onChange
 }: InputProps) => {
     return ( 
-        <div className="z-99 w-full">
+        <>
              <input
                     id={id}
                     name={name}
-                    value={value}
+                    // value={readOnly ? label : value}
                     type={type}
+                    defaultValue={value}
                     disabled={disabled}
                     readOnly={readOnly}
                     placeholder={placeholder ? placeholder : "  "}
                     onChange={onChange}
                     className={cn(`
-                        appearance-none
                         text-sm
                         w-full
                         truncate
@@ -57,7 +57,7 @@ export const Input = ({
                         className,
                         disabled && "opacity-80 cursor-not-allowed",
                         readOnly 
-                        ? "w-10 px-0 ring-0 shadow-none border-transparent bg-transparent"
+                        ? "px-0 ring-0 shadow-none border-transparent bg-transparent"
                         : "shadow-sm",
                         
                     )}
@@ -65,17 +65,17 @@ export const Input = ({
                 {/* {   !readOnly &&( */}
                     <label className={cn(`
                         absolute
-                        top-[20px]
-                        left-2
+                        top-2
+                        left-1
                         px-1
-                        text-sm
+                        text-xs
                         origin-[0]
                         z-10
                         duration-150
                         transform`,
                         !readOnly 
                         && `
-                            left-5
+                            left-2
                             -translate-y-4
                             bg-white
                             pointer-events-none
@@ -84,10 +84,9 @@ export const Input = ({
                             peer-focus:scale-90
                             peer-focus:-translate-y-4
                         `,
-                        className  
                     )}>
                         { label }
                     </label>
-        </div>
+        </>
     );
 }

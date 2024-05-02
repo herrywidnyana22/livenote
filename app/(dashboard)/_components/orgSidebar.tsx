@@ -4,16 +4,11 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { OrganizationSwitcher } from "@clerk/nextjs";
 import { LayoutDashboard, Star } from "lucide-react";
-import { Poppins } from "next/font/google";
 import { useSearchParams } from "next/navigation";
 
 import Link from "next/link";
 import Image from "next/image";
-
-const font = Poppins({
-    subsets: ["latin"],
-    weight: ["600"]
-})
+import { font } from "./font";
 
 export const OrgSidebar = () => {
 

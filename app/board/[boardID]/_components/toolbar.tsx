@@ -1,0 +1,77 @@
+const Toolbar = () => {
+    return (
+        <div
+            className="
+                absolute
+                flex
+                flex-col
+                gap-y-4 
+                top-[50%]
+                left-2
+                -translate-y-[50%]   
+            "
+        >
+            <div
+                className="
+                    flex
+                    flex-col
+                    gap-y-1
+                    p-1.5
+                    rounded-md
+                    shadow-md
+                    bg-white
+                "
+            >
+                <div>
+                    Pencil
+                </div>
+                <div>
+                    circle
+                </div>
+                <div>
+                    Square
+                </div>
+            </div>
+            <div
+                className="
+                    flex
+                    flex-col
+                    items-center
+                    p-1.5
+                    shadow-md
+                    rounded-md
+                    bg-white
+                "
+            >
+                <div>
+                    Undo
+                </div>
+                <div>
+                    Redo
+                </div>
+            </div>
+        </div>
+    );
+}
+ 
+export default Toolbar;
+
+export const ToolbarSkeleton =() =>{
+    return(
+        <div
+            className="
+                absolute
+                w-14 
+                h-[360px]
+                flex
+                flex-col
+                gap-y-4 
+                top-[50%]
+                left-2
+                -translate-y-[50%]
+                rounded-md
+                bg-white  
+            "
+        />
+    )
+}

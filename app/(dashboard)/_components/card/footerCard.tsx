@@ -78,18 +78,96 @@ export const FooterCard = ({
             "
         >
            
-            <div>
-                <Input
-                    id={id}
-                    name={id}
-                    type="text"
-                    value={value}
-                    label={title}
-                    onChange={(e) => setValue(e.target.value)}
-                    disabled={updateIsPending}
-                    readOnly={!(editedData === id && editedData !== "")}
-                />               
-                <p
+            <div
+                className={cn(`
+                    relative`,
+                    (editedData === id && editedData !== "")
+                    ? "w-full"
+                    : "max-w-[calc(100%-20px)]"
+                )}
+            >
+                {
+                    (editedData === id && editedData !== "")
+                    ?  <div 
+                            className="
+                                w-full
+                                flex
+                                gap-1
+                            "
+                        >
+                            <Input
+                                id={id}
+                                name={id}
+                                type="text"
+                                value={title}
+                                label={"Board Name"}
+                                onChange={(e) => setValue(e.target.value)}
+                                disabled={updateIsPending}
+                                readOnly={!(editedData === id && editedData !== "")}
+                            />
+                            <div
+                                className="
+                                    flex
+                                    gap-1
+                                "
+                            >   
+                                <Info label="Simpan">
+                                    <Button
+                                        onClick={onSubmit}
+                                        variant={"secondary"}
+                                        size={"sm"}
+                                        disabled={updateIsPending || value === ""}
+                                        className="px-2"
+                                    >
+                                        {
+                                            updateIsPending 
+                                            ?   (
+                                                    <Loader2
+                                                    className="
+                                                        w-3
+                                                        h-3
+                                                        text-green-800
+                                                        animate-spin
+                                                    "
+                                                    />
+                                                )
+                                            :   (<Save
+                                                    className="
+                                                        w-3
+                                                        h-3
+                                                        text-green-800
+                                                    "
+                                                />)
+                                        }
+                                        
+                                    </Button>
+                                </Info>
+                                
+                                <Info label="Cancel">
+                                    <Button
+                                        onClick={onCancel}
+                                        variant={"secondary"}
+                                        size={"sm"}
+                                        disabled={updateIsPending}
+                                        className="px-2 py-1"
+                                    >
+                                        <X
+                                            className="
+                                                w-3
+                                                h-3
+                                                text-rose-600
+                                            "
+                                        />
+                                    </Button>
+                                </Info>
+                                
+                            </div>
+                        </div>
+                    : <p className="truncate">{title}</p>
+                }
+               
+                
+                <span
                     className="
                         text-xs
                         text-muted-foreground
@@ -100,114 +178,50 @@ export const FooterCard = ({
                     "
                 >
                     {authorLabel}, {timeCreatedLabel}
-                </p>
+                </span>              
+                
             </div>
-            <div className="relative">
-                {
-                    editedData !== id
-                    && (
-                        <div
-                            className="
-                                h-full
-                                flex
-                                items-center
-                                opacity-0
-                                group-hover:opacity-100
-                            "
+            {
+            editedData !== id
+            && (
+                <div
+                    className="
+                        h-full
+                        opacity-0
+                        group-hover:opacity-100
+                    "
+                >
+                    <Info
+                        label={isFav ? "Your favorite board" : "Add to favorite"}
+                        side="top"
+                        align="center"
+                        sideOffset={5}
+                    >
+                        <button
+                            disabled={favIsPending || unFavIsPending}
+                            onClick={onFav}
+                            className={cn(`                        
+                                transition
+                                text-muted-foreground
+                                hover:text-blue-600`,
+                                favIsPending || unFavIsPending && "cursor-not-allowed opacity-75"
+                            )}
                         >
-                            <Info
-                                label={isFav ? "Your favorite board" : "Add to favorite"}
-                                side="top"
-                                align="center"
-                                sideOffset={5}
-                            >
-                                <button
-                                    disabled={favIsPending || unFavIsPending}
-                                    onClick={onFav}
-                                    className={cn(`                        
-                                        transition
-                                        text-muted-foreground
-                                        hover:text-blue-600`,
-                                        favIsPending || unFavIsPending && "cursor-not-allowed opacity-75"
-                                    )}
-                                >
-                                        
-                                    <Star
-                                        className={cn(`
-                                            w-5
-                                            h-5`,
-                                            isFav && "fill-blue-600 text-blue-600"
-                                        )}
-                                    />
-                                        
-                                    
-                                </button>
-                            </Info>
-                        </div>
-                    )
-                }
-                {
-                    (editedData === id && editedData !== "") &&
-                    <div
-                        className="
-                            flex
-                            gap-1
-                        "
-                    >   
-                        <Info label="Simpan">
-                            <Button
-                                onClick={onSubmit}
-                                variant={"secondary"}
-                                size={"sm"}
-                                disabled={updateIsPending || value === ""}
-                                className="p-2"
-                            >
-                                {
-                                    updateIsPending 
-                                    ?   (
-                                            <Loader2
-                                             className="
-                                                w-3
-                                                h-3
-                                                text-green-800
-                                                animate-spin
-                                            "
-                                            />
-                                        )
-                                    :   (<Save
-                                        className="
-                                            w-3
-                                            h-3
-                                            text-green-800
-                                        "
-                                    />)
-                                }
                                 
-                            </Button>
-                        </Info>
-                        
-                        <Info label="Cancel">
-                            <Button
-                                onClick={onCancel}
-                                variant={"secondary"}
-                                size={"sm"}
-                                disabled={updateIsPending}
-                                className="p-2"
-                            >
-                                <X
-                                    className="
-                                        w-3
-                                        h-3
-                                        text-rose-600
-                                    "
-                                />
-                            </Button>
-                        </Info>
-                        
-                    </div>
-                }
-
-            </div>
+                            <Star
+                                className={cn(`
+                                    w-5
+                                    h-5`,
+                                    isFav && "fill-blue-600 text-blue-600"
+                                )}
+                            />
+                                
+                            
+                        </button>
+                    </Info>
+                </div>
+            )
+            }
         </div>
     );
 }

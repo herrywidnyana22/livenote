@@ -11,7 +11,6 @@ import { Button } from "./ui/button"
 
 interface ActionProps{
     id: string
-    title: string
     children: React.ReactNode
     side?: DropdownMenuContentProps["side"]
     sideOffset?: DropdownMenuContentProps["sideOffset"]
@@ -20,7 +19,6 @@ interface ActionProps{
 
 const Actions = ({
     id,
-    title,
     children,
     side,
     sideOffset,
@@ -57,7 +55,6 @@ const Actions = ({
                 onClick={(event) => event.stopPropagation()}
                 side={side}
                 sideOffset={sideOffset}
-                className="w-full"
             >
                 <DropdownMenuItem
                     onClick={copyLink}
@@ -91,12 +88,14 @@ const Actions = ({
                     />
                     Rename this board
                 </DropdownMenuItem>
+                
                 <AlertModal
                     title="Delete this board?"
                     desc="This will delete the board and all of its contents"
                     disabled={isPending}
                     onOk={deleteBoard}
                 >
+
                     <Button
                         variant={"ghost"}
                         className="
