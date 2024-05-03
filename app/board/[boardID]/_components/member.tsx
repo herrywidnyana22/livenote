@@ -11,10 +11,10 @@ import { memberOnlineColor } from "@/lib/utils";
 const Member = () => {
     
     const maxUserList = 2
-    const viewer = useOthers()
+    const memberInRoom = useOthers()
     const currentUser = useSelf()
 
-    const isMoreUsers = viewer.length > maxUserList
+    const isMoreUsers = memberInRoom.length > maxUserList
 
     return (
         <div
@@ -35,7 +35,7 @@ const Member = () => {
             "
         >
             <Info
-                label="Viewer"
+                label="Online this Room"
                 side="left"
                 sideOffset={18}
             >
@@ -61,7 +61,7 @@ const Member = () => {
                 "       
             >
             {
-                viewer.slice(0, maxUserList).map(({connectionId, info}) =>{
+                memberInRoom.slice(0, maxUserList).map(({connectionId, info}) =>{
                     return(
                         <UserAvatar
                             key={connectionId}
@@ -86,8 +86,8 @@ const Member = () => {
             {
                 isMoreUsers && (
                     <UserAvatar
-                        name={`${viewer.length - maxUserList} more`}
-                        fallback={`+${viewer.length - maxUserList}`}
+                        name={`${memberInRoom.length - maxUserList} more`}
+                        fallback={`+${memberInRoom.length - maxUserList}`}
                     />
                 )
             }

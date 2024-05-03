@@ -3,6 +3,8 @@
 import { ReactNode } from "react"
 import { ClientSideSuspense } from "@liveblocks/react"
 import { RoomProvider } from "@/liveblocks.config"
+import { LiveList, LiveMap, LiveObject } from "@liveblocks/client"
+import { Layer } from "@/types/canvasType"
 
 
 interface LobbyProps {
@@ -18,7 +20,13 @@ export const Lobby = ({
     return ( 
         <RoomProvider
             id={lobbyID}
-            initialPresence={{}}
+            initialPresence={{
+                cursor: null
+            }}
+            initialStorage={{
+                layers: new LiveMap<string, LiveObject<Layer>>(),
+                layerID: new LiveList()
+            }}
         >
             <ClientSideSuspense fallback={fallback}>
                 {() => children}
