@@ -14,8 +14,6 @@ export const Cursor = memo(({connectionID}: CursorProps) => {
     const cursor = useOther(connectionID, (user) => user.presence.cursor)
     const name = members?.name || "Team Mate"
 
-    console.log({members}, {cursor})
-
     if(!cursor){
         return null
     }

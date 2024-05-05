@@ -21,7 +21,8 @@ export const Lobby = ({
         <RoomProvider
             id={lobbyID}
             initialPresence={{
-                cursor: null
+                cursor: null,
+                select: []
             }}
             initialStorage={{
                 layers: new LiveMap<string, LiveObject<Layer>>(),

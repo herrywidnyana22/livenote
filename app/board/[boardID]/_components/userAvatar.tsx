@@ -17,7 +17,7 @@ export const UserAvatar = ({
         <Info
             label={name || "Team Mate"}
             side="bottom"
-            sideOffset={18}
+            sideOffset={5}
         >  
             <Avatar
                 className="

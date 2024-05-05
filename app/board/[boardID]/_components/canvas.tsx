@@ -1,15 +1,17 @@
 'use client'
 
 import { useCallback, useState } from "react";
-import { useCanRedo, useCanUndo, useHistory, useMutation } from "@/liveblocks.config";
-
-import { Angle, CanvasMode, CanvasState, mouseEventInCanvas } from "@/types/canvasType";
+import { useCanRedo, useCanUndo, useHistory, useMutation, useStorage } from "@/liveblocks.config";
+import { nanoid } from "nanoid"
+import { Angle, CanvasMode, CanvasState, Color, LayerType, Point, mouseEventInCanvas } from "@/types/canvasType";
 
 import { CanvasHeader } from "./canvasHeader";
 
 import Toolbar from "./toolbar";
 import Member from "./member";
-import { CursorActive } from "./cursorActive";
+import { CursorMember } from "./cursorActive";
+import { LiveObject } from "@liveblocks/client";
+import { PreviewLayer } from "./previewLayes";
 interface CanvasProps{
     boardID: string
 }
@@ -23,20 +25,59 @@ const Canvas = ({
         mode: CanvasMode.None
     })
 
+    const [lastColor, setLastColor] = useState<Color>({
+        r: 0,
+        g: 0,
+        b: 0
+    })
+
     const [angle, setAngle] = useState<Angle>({
         x: 0,
         y: 0
     })
 
+    
+
     const history = useHistory()
     const isUndo = useCanUndo()
     const isRedo = useCanRedo()
 
-    const onWheel = useCallback((e: React.WheelEvent) => {
-        console.log({
-            x: e.deltaX,
-            y: e.deltaY
+     // LAYERING
+    const layerIDS = useStorage((root) => root.layerID)
+    const addLayer = useMutation((
+        {storage, setMyPresence},
+        LayerType: LayerType.Circle
+                | LayerType.Rectangle
+                | LayerType.Note
+                | LayerType.Text,
+        position: Point
+    ) =>{
+        const liveLayer = storage.get("layers")
+
+        if(liveLayer.size >= maxLayer){
+            return
+        }
+
+        const liveLayerID = storage.get("layerID")
+        const layerID = nanoid()
+        const layer = new LiveObject({
+            type: LayerType,
+            width: 100,
+            height: 100,
+            x: position.x,
+            y: position.y,
+            fill: lastColor
         })
+        
+        liveLayerID.push(layerID)
+        liveLayer.set(layerID, layer)   
+
+        setMyPresence({select: [layerID]}, {addToHistory: true})
+    
+    },[lastColor])
+
+    // MOUSE MOVEMENT
+    const onWheel = useCallback((e: React.WheelEvent) => {
 
         setAngle((angle) => ({
             x: angle.x - e.deltaX,
@@ -48,8 +89,6 @@ const Canvas = ({
         e.preventDefault()
         const current = mouseEventInCanvas(e, angle)
 
-        console.log({current})
-
         setMyPresence({cursor: current})
     }, [])
     
@@ -57,6 +96,23 @@ const Canvas = ({
     const onMouseOut= useMutation(({setMyPresence}) =>{
          setMyPresence({cursor: null})
     }, [])
+
+    const onMouseUp = useMutation(({}, e) => {
+        const point = mouseEventInCanvas(e, angle)
+
+        if(canvasState.mode === CanvasMode.Insert){
+            addLayer(canvasState.layer, point)
+        } else {
+            setCanvasState({
+                mode: CanvasMode.None
+            })
+        }
+
+        history.resume()
+    },[angle, canvasState, history, addLayer])
+
+    // END MOUSE MOVEMENT
+
     
     return (
         <main
@@ -81,6 +137,7 @@ const Canvas = ({
             <svg
                 onPointerMove={onMouseMove}
                 onPointerLeave={onMouseOut}
+                onPointerUp={onMouseUp}
                 onWheel={onWheel}
                 className="
                     w-[100vw]
@@ -92,7 +149,19 @@ const Canvas = ({
                         transform: `translate(${angle.x}px, ${angle.y}px)`
                     }}
                 >
-                    <CursorActive/>
+                    {
+                        layerIDS.map((id) =>(
+                            <PreviewLayer
+                                key={id}
+                                id={id}
+                                onMousePress={() =>{}}
+                                selectedColor ={"#EA212D"}
+                            />
+                        ))
+                    }
+
+                    
+                    <CursorMember/>
                 </g>
             </svg>
         </main>

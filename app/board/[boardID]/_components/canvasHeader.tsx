@@ -243,7 +243,6 @@ export const CanvasHeaderSkeleton = () =>{
                 left-2
                 px-1.5
                 rounded-md
-                shadow-md
                 bg-white
             "
         />

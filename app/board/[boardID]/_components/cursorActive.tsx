@@ -21,7 +21,7 @@ const Cursors = () =>{
     )
 }
 
-export const CursorActive = memo(() => {
+export const CursorMember = memo(() => {
     return ( 
         <>
             <Cursors/>
@@ -29,4 +29,4 @@ export const CursorActive = memo(() => {
     );
 })
 
-CursorActive.displayName = "CursorActive"
+CursorMember.displayName = "CursorActive"

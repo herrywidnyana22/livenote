@@ -12,6 +12,7 @@ const client = createClient({
 // `user.presence` property. Must be JSON-serializable.
 type Presence = {
   cursor: { x: number, y: number } | null,
+  select: string[]
   // ...
 };
 
