@@ -1,7 +1,7 @@
 'use client'
 
-import { useCallback, useState } from "react";
-import { useCanRedo, useCanUndo, useHistory, useMutation, useStorage } from "@/liveblocks.config";
+import { useCallback, useMemo, useState } from "react";
+import { useCanRedo, useCanUndo, useHistory, useMutation, useOthersMapped, useStorage } from "@/liveblocks.config";
 import { nanoid } from "nanoid"
 import { Angle, CanvasMode, CanvasState, Color, LayerType, Point, mouseEventInCanvas } from "@/types/canvasType";
 
@@ -11,7 +11,9 @@ import Toolbar from "./toolbar";
 import Member from "./member";
 import { CursorMember } from "./cursorActive";
 import { LiveObject } from "@liveblocks/client";
-import { PreviewLayer } from "./previewLayes";
+import { PreviewLayer } from "./previewLayer";
+import { memberOnlineColor } from "@/lib/utils";
+
 interface CanvasProps{
     boardID: string
 }
@@ -26,17 +28,15 @@ const Canvas = ({
     })
 
     const [lastColor, setLastColor] = useState<Color>({
-        r: 0,
-        g: 0,
-        b: 0
+        r: 219,
+        g: 39,
+        b: 119
     })
 
     const [angle, setAngle] = useState<Angle>({
         x: 0,
         y: 0
     })
-
-    
 
     const history = useHistory()
     const isUndo = useCanUndo()
@@ -76,9 +76,8 @@ const Canvas = ({
     
     },[lastColor])
 
-    // MOUSE MOVEMENT
+    // sdMOUSE EVENT
     const onWheel = useCallback((e: React.WheelEvent) => {
-
         setAngle((angle) => ({
             x: angle.x - e.deltaX,
             y: angle.y - e.deltaY
@@ -111,8 +110,50 @@ const Canvas = ({
         history.resume()
     },[angle, canvasState, history, addLayer])
 
-    // END MOUSE MOVEMENT
+    const onMousePressItem = useMutation((
+        {self, setMyPresence},
+        e:React.PointerEvent,
+        layerID: string
+    ) => {
+        if(canvasState.mode === CanvasMode.Pencil || canvasState.mode === CanvasMode.Insert){
+            return
+        }
 
+        history.pause()
+        e.stopPropagation()
+
+        const point = mouseEventInCanvas(e, angle)
+
+        if(!self.presence.select.includes(layerID)){
+            setMyPresence(
+                { select: [layerID] },
+                { addToHistory: true }
+            )
+        }
+
+        setCanvasState({
+            mode: CanvasMode.Translate,
+            current: point
+        })
+    },[setCanvasState, angle, history, canvasState.mode])
+
+    // END MOUSE EVENT
+
+    const selected = useOthersMapped((other) => other.presence.select)
+
+    const memberColorOnSelected = useMemo(() => {
+        const memberColor:Record<string, string> = {}
+
+        for (const user of selected){
+            const [connectionID, selection] = user
+
+            for (const layerID of selection){
+                memberColor[layerID] = memberOnlineColor(connectionID)
+            }
+        }
+
+        return memberColor
+    },[selected])
     
     return (
         <main
@@ -154,8 +195,8 @@ const Canvas = ({
                             <PreviewLayer
                                 key={id}
                                 id={id}
-                                onMousePress={() =>{}}
-                                selectedColor ={"#EA212D"}
+                                onMousePress={onMousePressItem}
+                                selectedColor ={memberColorOnSelected[id]}
                             />
                         ))
                     }

@@ -1,5 +1,6 @@
 'use client'
 
+import { rgbToHex } from "@/lib/utils"
 import { RectangleLayer } from "@/types/canvasType"
 
 interface RectangleProps{
@@ -33,8 +34,8 @@ export const Rectangle = ({
             y={0}
             width={width}
             height={height}
-            fill="#000"
-            stroke="transparent"
+            fill={fill ? rgbToHex(fill) : "#ddd"}
+            stroke={selectedColor || "transparent"}
             strokeWidth={1}
             className="
                 drop-shadow-md
