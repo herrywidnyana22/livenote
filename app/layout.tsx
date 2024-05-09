@@ -3,6 +3,7 @@ import "./globals.css";
 
 import { ConvexClient } from "@/providers/convex-client";
 import { Inter } from "next/font/google";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ConvexClient>
+          <Toaster/>
           {children}
         </ConvexClient>
       </body>
