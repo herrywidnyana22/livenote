@@ -77,6 +77,16 @@ const Canvas = ({
     
     },[lastColor])
 
+    const unSelectLayer = useMutation(({ self, setMyPresence })  => {
+        if(self.presence.select.length > 0){
+            setMyPresence(
+                {select: []},
+                {addToHistory: true}
+            )
+        }
+
+    },[])
+
     const onResize = useCallback((position: Side, initialResize: dimention) => {
         history.pause()
 
@@ -114,8 +124,8 @@ const Canvas = ({
         if(canvasState.mode !== CanvasMode.Move) return
 
         const offset = {
-            x: point.x = canvasState.current.x,
-            y: point.y = canvasState.current.y,
+            x: point.x - canvasState.current.x,
+            y: point.y - canvasState.current.y,
         }
 
         const liveLayer = storage.get("layers")
@@ -155,6 +165,7 @@ const Canvas = ({
             onMoving(current)
         } else if(canvasState.mode === CanvasMode.Resize){
             onResizing(current)
+            onMoving(current)
         }
 
         setMyPresence({cursor: current})
@@ -168,7 +179,15 @@ const Canvas = ({
     const onMouseUp = useMutation(({}, e) => {
         const point = mouseEventInCanvas(e, angle)
 
-        if(canvasState.mode === CanvasMode.Insert){
+        if(
+            canvasState.mode === CanvasMode.None
+            || canvasState.mode === CanvasMode.Press
+        ){
+            unSelectLayer()
+            setCanvasState({
+                mode: CanvasMode.None
+            }) 
+        } else if(canvasState.mode === CanvasMode.Insert){
             addLayer(canvasState.layer, point)
         } else {
             setCanvasState({
@@ -177,9 +196,23 @@ const Canvas = ({
         }
 
         history.resume()
-    },[angle, canvasState, history, addLayer])
+    },[angle, canvasState, history, addLayer, unSelectLayer])
 
-    const onMousePressItem = useMutation((
+    const onMousePress = useCallback((e: React.PointerEvent) =>{
+        const point = mouseEventInCanvas(e, angle)
+
+        if(canvasState.mode === CanvasMode.Insert){
+            return
+        }
+        // TODO: ADD CASE DRAWING
+
+        setCanvasState({
+            origin: point,
+            mode: CanvasMode.Press
+        })
+    },[canvasState.mode, canvasState, angle])
+
+    const onMouseSelectItem = useMutation((
         {self, setMyPresence},
         e:React.PointerEvent,
         layerID: string
@@ -204,6 +237,7 @@ const Canvas = ({
             mode: CanvasMode.Move,
             current: point
         })
+
     },[setCanvasState, angle, history, canvasState.mode])
 
     // END MOUSE EVENT
@@ -248,6 +282,7 @@ const Canvas = ({
                 onPointerMove={onMouseMove}
                 onPointerLeave={onMouseOut}
                 onPointerUp={onMouseUp}
+                onPointerDown={onMousePress}
                 onWheel={onWheel}
                 className="
                     w-[100vw]
@@ -264,7 +299,7 @@ const Canvas = ({
                             <PreviewLayer
                                 key={id}
                                 id={id}
-                                onMousePress={onMousePressItem}
+                                onMousePress={onMouseSelectItem}
                                 selectedColor ={memberColorOnSelected[id]}
                             />
                         ))
