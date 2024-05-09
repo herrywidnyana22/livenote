@@ -24,8 +24,8 @@ export type CanvasState =
         }
     |   {
             mode: CanvasMode.Resize
-            initialBounds: dimention
-            corner: Side
+            initialResize: dimention
+            position: Side
         }
 
 export enum CanvasMode{
