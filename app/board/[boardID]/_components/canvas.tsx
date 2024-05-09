@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useCanRedo, useCanUndo, useHistory, useMutation, useOthersMapped, useStorage } from "@/liveblocks.config";
 import { nanoid } from "nanoid"
-import { Angle, CanvasMode, CanvasState, Color, LayerType, Point, mouseEventInCanvas } from "@/types/canvasType";
+import { Angle, CanvasMode, CanvasState, Color, LayerType, Point, Side, dimention, mouseEventInCanvas } from "@/types/canvasType";
 
 import { CanvasHeader } from "./canvasHeader";
 
@@ -12,7 +12,8 @@ import Member from "./member";
 import { CursorMember } from "./cursorActive";
 import { LiveObject } from "@liveblocks/client";
 import { PreviewLayer } from "./previewLayer";
-import { memberOnlineColor } from "@/lib/utils";
+import { memberOnlineColor, resizing } from "@/lib/utils";
+import SelectedBox from "./selectedBox";
 
 interface CanvasProps{
     boardID: string
@@ -76,7 +77,38 @@ const Canvas = ({
     
     },[lastColor])
 
-    // sdMOUSE EVENT
+    const onResize = useCallback((position: Side, initialResize: dimention) => {
+        history.pause()
+
+        setCanvasState({
+            mode: CanvasMode.Resize,
+            initialResize,
+            position
+        })
+    },[])
+
+    const onResizing = useMutation((
+        { storage, self},
+        point: Point
+    ) => {
+        if(canvasState.mode !== CanvasMode.Resize) return
+
+        const resizingItem = resizing(
+            canvasState.initialResize,
+            canvasState.position,
+            point
+        )
+
+        const liveLayer = storage.get("layers")
+        const layer = liveLayer.get(self.presence.select[0])
+
+        if(layer){
+            layer.update(resizingItem)
+
+        }
+    },[canvasState])
+
+    // MOUSE EVENT
     const onWheel = useCallback((e: React.WheelEvent) => {
         setAngle((angle) => ({
             x: angle.x - e.deltaX,
@@ -88,8 +120,13 @@ const Canvas = ({
         e.preventDefault()
         const current = mouseEventInCanvas(e, angle)
 
+        // RESIZE HANDLER
+        if(canvasState.mode === CanvasMode.Resize){
+            onResizing(current)
+        }
+
         setMyPresence({cursor: current})
-    }, [])
+    }, [canvasState, angle, onResizing])
     
 
     const onMouseOut= useMutation(({setMyPresence}) =>{
@@ -200,8 +237,10 @@ const Canvas = ({
                             />
                         ))
                     }
+                    <SelectedBox
+                        onResize={onResize}
+                    />
 
-                    
                     <CursorMember/>
                 </g>
             </svg>
