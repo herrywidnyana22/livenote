@@ -15,7 +15,7 @@ export type CanvasState =
             current?: Point
         }
     |   {
-            mode: CanvasMode.Translate
+            mode: CanvasMode.Move
             current: Point
         }
     |   {
@@ -32,7 +32,7 @@ export enum CanvasMode{
     None,
     Press,
     Select,
-    Translate,
+    Move,
     Insert,
     Resize,
     Pencil,

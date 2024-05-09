@@ -104,9 +104,39 @@ const Canvas = ({
 
         if(layer){
             layer.update(resizingItem)
-
         }
     },[canvasState])
+
+    const onMoving = useMutation((
+        { storage, self },
+        point: Point
+    ) => {
+        if(canvasState.mode !== CanvasMode.Move) return
+
+        const offset = {
+            x: point.x = canvasState.current.x,
+            y: point.y = canvasState.current.y,
+        }
+
+        const liveLayer = storage.get("layers")
+        for (const id of self.presence.select){
+            const layer = liveLayer.get(id)
+
+            if(layer){
+                layer.update({
+                    x: layer.get("x") + offset.x,
+                    y: layer.get("y") + offset.y
+                })
+            }
+        }
+
+        setCanvasState({
+            mode: CanvasMode.Move,
+            current: point
+        })
+    },[canvasState])
+
+    // END LAYERING
 
     // MOUSE EVENT
     const onWheel = useCallback((e: React.WheelEvent) => {
@@ -121,12 +151,14 @@ const Canvas = ({
         const current = mouseEventInCanvas(e, angle)
 
         // RESIZE HANDLER
-        if(canvasState.mode === CanvasMode.Resize){
+        if(canvasState.mode === CanvasMode.Move){
+            onMoving(current)
+        } else if(canvasState.mode === CanvasMode.Resize){
             onResizing(current)
         }
 
         setMyPresence({cursor: current})
-    }, [canvasState, angle, onResizing])
+    }, [canvasState, angle, onResizing, onMoving])
     
 
     const onMouseOut= useMutation(({setMyPresence}) =>{
@@ -169,7 +201,7 @@ const Canvas = ({
         }
 
         setCanvasState({
-            mode: CanvasMode.Translate,
+            mode: CanvasMode.Move,
             current: point
         })
     },[setCanvasState, angle, history, canvasState.mode])

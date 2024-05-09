@@ -34,22 +34,22 @@ export function resizing(
     y: resize.y
   }
 
-  if((position && Side.Top) === Side.Top){
+  if((position & Side.Top) === Side.Top){
     result.y = Math.min(point.y, resize.y + resize.height)
     result.height = Math.abs(resize.y + resize.height - point.y)
   }
 
-  if((position && Side.Bottom) === Side.Bottom){
+  if((position & Side.Bottom) === Side.Bottom){
     result.y = Math.min(point.y, resize.y)
     result.height = Math.abs(point.y - resize.y)
   }
 
-  if((position && Side.Left) === Side.Left){
+  if((position & Side.Left) === Side.Left){
     result.x = Math.min(point.x, resize.x + resize.width)
     result.width = Math.abs(resize.x + resize.width - point.x)
   }
 
-  if((position && Side.Right) === Side.Right){
+  if((position & Side.Right) === Side.Right){
     result.x = Math.min(point.x, resize.x)
     result.width = Math.abs(point.x - resize.x)
   }
