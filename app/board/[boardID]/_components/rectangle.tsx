@@ -1,6 +1,6 @@
 'use client'
 
-import { rgbToHex } from "@/lib/utils"
+import { cn, rgbToHex } from "@/lib/utils"
 import { RectangleLayer } from "@/types/canvasType"
 
 interface RectangleProps{
@@ -37,9 +37,7 @@ export const Rectangle = ({
             fill={fill ? rgbToHex(fill) : "#ddd"}
             stroke={selectedColor || "transparent"}
             strokeWidth={1}
-            className="
-                drop-shadow-md
-            "
+            className="drop-shadow-md"
             style={{
                 transform: `translate(${x}px, ${y}px)`
             }}

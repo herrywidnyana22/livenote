@@ -12,7 +12,7 @@ import Member from "./member";
 import { CursorMember } from "./cursorActive";
 import { LiveObject } from "@liveblocks/client";
 import { PreviewLayer } from "./previewLayer";
-import { memberOnlineColor, resizing } from "@/lib/utils";
+import { cn, memberOnlineColor, resizing } from "@/lib/utils";
 import SelectedBox from "./selectedBox";
 import { OptionTools } from "./tools";
 
@@ -166,7 +166,6 @@ const Canvas = ({
             onMoving(current)
         } else if(canvasState.mode === CanvasMode.Resize){
             onResizing(current)
-            onMoving(current)
         }
 
         setMyPresence({cursor: current})
@@ -289,10 +288,12 @@ const Canvas = ({
                 onPointerUp={onMouseUp}
                 onPointerDown={onMousePress}
                 onWheel={onWheel}
-                className="
+                className={cn(`
                     w-[100vw]
-                    h-[100vh]
-                "
+                    h-[100vh]`,
+                    canvasState.mode === CanvasMode.Move
+                    && "cursor-grabbing"
+                )}
             >
                 <g
                     style={{
