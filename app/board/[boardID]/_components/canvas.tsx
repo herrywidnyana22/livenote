@@ -14,6 +14,7 @@ import { LiveObject } from "@liveblocks/client";
 import { PreviewLayer } from "./previewLayer";
 import { memberOnlineColor, resizing } from "@/lib/utils";
 import SelectedBox from "./selectedBox";
+import { OptionTools } from "./tools";
 
 interface CanvasProps{
     boardID: string
@@ -95,7 +96,7 @@ const Canvas = ({
             initialResize,
             position
         })
-    },[])
+    },[history])
 
     const onResizing = useMutation((
         { storage, self},
@@ -210,7 +211,7 @@ const Canvas = ({
             origin: point,
             mode: CanvasMode.Press
         })
-    },[canvasState.mode, canvasState, angle])
+    },[canvasState, angle])
 
     const onMouseSelectItem = useMutation((
         {self, setMyPresence},
@@ -277,6 +278,10 @@ const Canvas = ({
                 redo={history.redo}
                 isUndo={isUndo}
                 isRedo={isRedo}
+            />
+            <OptionTools
+                angle={angle}
+                setLastColor={setLastColor}
             />
             <svg
                 onPointerMove={onMouseMove}
