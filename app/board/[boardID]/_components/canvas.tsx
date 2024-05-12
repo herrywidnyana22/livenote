@@ -14,14 +14,15 @@ import { LiveObject } from "@liveblocks/client";
 import { PreviewLayer } from "./previewLayer";
 import { cn, memberOnlineColor, resizing } from "@/lib/utils";
 import SelectedBox from "./selectedBox";
-import { OptionTools } from "./tools";
+import { OptionTools } from "./optionTools";
 import { CursorMember } from "./cursorMember";
+import { toast } from "sonner";
 
 interface CanvasProps{
     boardID: string
 }
 
-const maxLayer = 50
+const MAX_LAYER = 200
 
 const Canvas = ({
     boardID
@@ -31,9 +32,9 @@ const Canvas = ({
     })
 
     const [lastColor, setLastColor] = useState<Color>({
-        r: 219,
-        g: 39,
-        b: 119
+        r: 171,
+        g: 184,
+        b: 195
     })
 
     const [angle, setAngle] = useState<Angle>({
@@ -57,7 +58,8 @@ const Canvas = ({
     ) =>{
         const liveLayer = storage.get("layers")
 
-        if(liveLayer.size >= maxLayer){
+        if(liveLayer.size >= MAX_LAYER){
+            toast.error("Cannot add item, you can only add 50 items...!")
             return
         }
 
@@ -196,7 +198,7 @@ const Canvas = ({
 
         } else if(canvasState.mode === CanvasMode.Insert){
             addLayer(canvasState.layer, point)
-            setMyPresence({activeTools: "Type"}) 
+            console.log(`Layer : ${canvasState.layer}`)
         } else {
             setCanvasState({
                 mode: CanvasMode.None
@@ -279,7 +281,8 @@ const Canvas = ({
                 bg-neutral-100
             "
         >
-            <CanvasHeader baordID={boardID}/>
+            {/* <div className="absolute top-20">{JSON.stringify(storage.get("layers"))}</div> */}
+            <CanvasHeader boardID={boardID}/>
             <Member/>
             <Toolbar
                 canvasState={canvasState}

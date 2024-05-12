@@ -1,6 +1,6 @@
 'use client'
 
-import { cn, rgbToHex } from "@/lib/utils"
+import { rgbToHex } from "@/lib/utils"
 import { RectangleLayer } from "@/types/canvasType"
 
 interface RectangleProps{

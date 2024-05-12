@@ -17,7 +17,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 interface CanvasHeaderProps{
-    baordID: string
+    boardID: string
 }
 
 const HeaderSeparator = () =>{
@@ -33,14 +33,14 @@ const HeaderSeparator = () =>{
     )
 }
 
-export const CanvasHeader = ({baordID}: CanvasHeaderProps) =>{
+export const CanvasHeader = ({boardID}: CanvasHeaderProps) =>{
     const [value, setValue] = useState("")
     const [editedData, setEditedData] = useState("")
 
     const { mutate: updateMutate, isPending: updateIsPending } = useHookMutation(api.board.update);
     
     const data = useQuery(api.board.getByID, {
-        id: baordID as Id<"boards">
+        id: boardID as Id<"boards">
     })
 
     if(!data) return <CanvasHeaderSkeleton/>
