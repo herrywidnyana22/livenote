@@ -4,21 +4,23 @@ import { useSelectedResize } from "@/hooks/useSelectedResize"
 import { useMutation, useSelf } from "@/liveblocks.config"
 import { Angle, Color } from "@/types/canvasType"
 import { memo } from "react"
-import { ColorOptions } from "./ColorOption"
 import { useDeleteLayer } from "@/hooks/useDeleteLayer"
 import { Info } from "@/components/info"
 import { Button } from "@/components/ui/button"
 import { ArrowBigDownDash, ArrowBigUpDash, Trash2 } from "lucide-react"
+import { ColorOptions } from "./ColorOption"
 
 interface OptionToolsprops{
     angle: Angle
     setLastColor: (color: Color) => void
+    selectedColor: Color
 }
 
 
 export const OptionTools = memo(({
     angle, 
-    setLastColor
+    setLastColor,
+    selectedColor
 }: OptionToolsprops) => {
 
     const selection = useSelf((me) => me.presence.select)
@@ -130,6 +132,7 @@ export const OptionTools = memo(({
             </div>
             <ColorOptions
                 onChange ={setFill}
+                selectedColor={selectedColor}
             />
             <div
                 className="

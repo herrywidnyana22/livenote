@@ -4,7 +4,8 @@ import { useStorage } from "@/liveblocks.config"
 import { LayerType } from "@/types/canvasType"
 import { memo } from "react"
 import { Rectangle } from "./rectangle"
-
+import { Text } from "./text"
+import { Circle } from "./Circle"
 
 interface PreviewLayerProps{
     id: string
@@ -23,6 +24,16 @@ export const PreviewLayer = memo(({
     if(!layer) return null
 
     switch(layer.type){
+        case LayerType.Circle:
+            return(
+                <Circle
+                    id={id}
+                    layer={layer}
+                    onMousePress={onMousePress}
+                    selectedColor={selectedColor}
+                />
+            )
+
         case LayerType.Rectangle:
             return(
                 <Rectangle
@@ -33,8 +44,18 @@ export const PreviewLayer = memo(({
                 />
             )
 
+        case LayerType.Text:
+            return(
+                <Text
+                    id={id}
+                    layer={layer}
+                    onMousePress={onMousePress}
+                    selectedColor={selectedColor}
+                />
+            )
+
         default:
-            // console.warn("Unknown Layer type")
+            console.warn("Unknown Layer type")
             return null
     }
 })

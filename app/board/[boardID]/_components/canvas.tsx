@@ -101,13 +101,12 @@ const Canvas = ({
             select: IDData
         })
     },[layerIDS])
-    
+
     const multiSelect = useCallback((
         current: Point,
         origin: Point
     ) => {
         if(Math.abs(current.x - origin.x) + Math.abs(current.y - origin.y) > 5) {
-            console.log("MULTISELECT ON")
             setCanvasState({
                 mode: CanvasMode.Select,
                 origin,
@@ -335,6 +334,7 @@ const Canvas = ({
             <OptionTools
                 angle={angle}
                 setLastColor={setLastColor}
+                selectedColor={lastColor}
             />
             <svg
                 onPointerMove={onMouseMove}
@@ -367,6 +367,25 @@ const Canvas = ({
                     <SelectedBox
                         onResize={onResize}
                     />
+
+                    {
+                        // INFO: SELECTING BOX AREA
+                        canvasState.mode === CanvasMode.Select
+                        && canvasState.current != null
+                        && (
+                                <rect
+                                    width={Math.abs(canvasState.origin.x - canvasState.current.x)}
+                                    height={Math.abs(canvasState.origin.y - canvasState.current.y)}
+                                    x={Math.min(canvasState.origin.x,  canvasState.current.x)}
+                                    y={Math.min(canvasState.origin.y, canvasState.current.y)}
+                                    className="
+                                        stroke-1
+                                        fill-blue-500/5
+                                        stroke-blue-500
+                                    "
+                                />
+                            )
+                    }
 
                     <CursorMember
                         canvasState={canvasState}

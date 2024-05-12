@@ -1,13 +1,18 @@
 'use client'
 
-import { rgbToHex } from "@/lib/utils";
+import { calculateBrightness, rgbToHex } from "@/lib/utils";
 import { Color } from "@/types/canvasType";
+import { Check } from "lucide-react";
 
 type ColorOptionsProps = {
     onChange: (color: Color) => void
+    selectedColor: Color
 }
 
-export const ColorOptions = ({onChange}: ColorOptionsProps) => {
+export const ColorOptions = ({
+    onChange,
+    selectedColor
+}: ColorOptionsProps) => {
     
 
     return ( 
@@ -31,6 +36,7 @@ export const ColorOptions = ({onChange}: ColorOptionsProps) => {
                     g: 82,
                     b: 94
                 }}
+                selectedColor={selectedColor}
             />
             <ColorButton
                 onClick={onChange}
@@ -39,6 +45,7 @@ export const ColorOptions = ({onChange}: ColorOptionsProps) => {
                     g: 235,
                     b: 59
                 }}
+                selectedColor={selectedColor}
             />
             <ColorButton
                 onClick={onChange}
@@ -47,6 +54,7 @@ export const ColorOptions = ({onChange}: ColorOptionsProps) => {
                     g: 200,
                     b: 100
                 }}
+                selectedColor={selectedColor}
             />
             <ColorButton
                 onClick={onChange}
@@ -55,6 +63,7 @@ export const ColorOptions = ({onChange}: ColorOptionsProps) => {
                     g: 145,
                     b: 235
                 }}
+                selectedColor={selectedColor}
             />
             <ColorButton
                 onClick={onChange}
@@ -63,6 +72,7 @@ export const ColorOptions = ({onChange}: ColorOptionsProps) => {
                     g: 105,
                     b: 245
                 }}
+                selectedColor={selectedColor}
             />
             <ColorButton
                 onClick={onChange}
@@ -71,6 +81,7 @@ export const ColorOptions = ({onChange}: ColorOptionsProps) => {
                     g: 145,
                     b: 42
                 }}
+                selectedColor={selectedColor}
             />
             <ColorButton
                 onClick={onChange}
@@ -79,6 +90,7 @@ export const ColorOptions = ({onChange}: ColorOptionsProps) => {
                     g: 255,
                     b: 255
                 }}
+                selectedColor={selectedColor}
             />
             <ColorButton
                 onClick={onChange}
@@ -87,6 +99,7 @@ export const ColorOptions = ({onChange}: ColorOptionsProps) => {
                     g: 0,
                     b: 0
                 }}
+                selectedColor={selectedColor}
             />
         </div>
     );
@@ -95,10 +108,15 @@ export const ColorOptions = ({onChange}: ColorOptionsProps) => {
 type ColorButtonProps = {
     color: Color,
     onClick: (color:Color) => void
+    selectedColor: Color
 }
 
 
-const ColorButton = ({color, onClick}: ColorButtonProps) => {
+const ColorButton = ({color, onClick, selectedColor}: ColorButtonProps) => {
+    
+    const luminanceThreshold = 0.7
+    const iconColor = calculateBrightness(color) > luminanceThreshold ? 'black' : 'white'
+    
     return ( 
         <button
             onClick={() =>onClick(color)}
@@ -112,11 +130,15 @@ const ColorButton = ({color, onClick}: ColorButtonProps) => {
                 hover:opacity-75
             "
         >
+            
             <div
                 style={{
                     background: rgbToHex(color)
                 }}
                 className="
+                    flex
+                    items-center
+                    justify-center
                     w-8
                     h-8
                     rounded-md
@@ -124,7 +146,18 @@ const ColorButton = ({color, onClick}: ColorButtonProps) => {
                     border-neutral-300
                 "
             >
-
+                {
+                    
+                    selectedColor.r === color.r 
+                    && selectedColor.g === color.g 
+                    && selectedColor.b === color.b
+                    && (
+                        <Check
+                            color={iconColor}
+                        />
+                       )
+                    
+                }
             </div>
         </button>
     );

@@ -94,3 +94,21 @@ export function findIntersectingWithRectangle(
 
   return IDData
 }
+
+export const calculateBrightness = (color: Color) => {
+  const luminance = (0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b) / 255
+
+  return luminance
+}
+
+export const calculateFontSize = (width: number, height: number) =>{
+  const maxSize = 96
+  const scale = 0.5
+
+  const sizeBasedOnWidth = width * scale
+  const sizeBasedOnHeight = height * scale
+
+  const fontSize = Math.min(sizeBasedOnWidth, sizeBasedOnHeight, maxSize)
+
+  return fontSize
+}

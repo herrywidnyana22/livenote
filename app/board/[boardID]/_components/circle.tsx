@@ -1,22 +1,21 @@
 'use client'
 
 import { rgbToHex } from "@/lib/utils"
-import { RectangleLayer } from "@/types/canvasType"
+import { CircleLayer } from "@/types/canvasType"
 
-interface RectangleProps{
+interface CircleProps{
     id: string
-    layer: RectangleLayer
+    layer: CircleLayer
     onMousePress: (e:React.PointerEvent, id: string) => void
     selectedColor?: string
 }
 
-
-export const Rectangle = ({
+export const Circle = ({
     id,
     layer,
     onMousePress,
     selectedColor
-}: RectangleProps) => {
+}: CircleProps) => {
 
     const {
         x,
@@ -25,12 +24,14 @@ export const Rectangle = ({
         height,
         fill,
     } = layer
-
+    
     return ( 
-        <rect
+        <ellipse
             onPointerDown={(e) => onMousePress(e, id)}
-            x={0}
-            y={0}
+            cx={width/2}
+            cy={height/2}
+            rx={width/2}
+            ry={height/2}
             width={width}
             height={height}
             fill={fill ? rgbToHex(fill) : "#ddd"}
