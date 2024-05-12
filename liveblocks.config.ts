@@ -1,6 +1,7 @@
 import { LiveList, LiveMap, LiveObject, createClient } from "@liveblocks/client";
 import { createRoomContext, createLiveblocksContext } from "@liveblocks/react";
 import { Layer } from "./types/canvasType";
+import * as LucideIcons from "lucide-react";
   
 const client = createClient({
   throttle: 16,
@@ -12,7 +13,8 @@ const client = createClient({
 // `user.presence` property. Must be JSON-serializable.
 type Presence = {
   cursor: { x: number, y: number } | null,
-  select: string[]
+  select: string[],
+  activeTools?: keyof typeof LucideIcons
   // ...
 };
 

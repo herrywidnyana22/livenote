@@ -1,18 +1,24 @@
 'use client'
 
+import * as LucideIcons from "lucide-react"
+
 import { memberOnlineColor } from "@/lib/utils"
 import { useOther } from "@/liveblocks.config";
-import { MousePointer2 } from "lucide-react";
+import { MousePointer2, LucideIcon } from "lucide-react";
 import { memo } from "react";
 interface CursorProps{
     connectionID: number
 }
 
-
 export const Cursor = memo(({connectionID}: CursorProps) => {
     const members = useOther(connectionID, (user) => user?.info)
     const cursor = useOther(connectionID, (user) => user.presence.cursor)
+    const memberToolActive = useOther(connectionID, (user) => user.presence.activeTools)
     const name = members?.name || "Team Mate"
+
+    const IconToolActive = memberToolActive ? LucideIcons[memberToolActive] as LucideIcon : undefined
+
+    console.log({memberToolActive})
 
     if(!cursor){
         return null
@@ -41,7 +47,22 @@ export const Cursor = memo(({connectionID}: CursorProps) => {
                     fill: memberOnlineColor(connectionID),
                     color: memberOnlineColor(connectionID)
                 }}
+            />
+            {
+                IconToolActive && 
+                <IconToolActive
+                    style={{
+                        color: memberOnlineColor(connectionID)
+                    }} 
+                    className="
+                        absolute
+                        w-3
+                        h-3
+                        top-0
+                        right-2
+                    "
                 />
+            }
             <div
                 className="
                     absolute
@@ -63,5 +84,7 @@ export const Cursor = memo(({connectionID}: CursorProps) => {
         </foreignObject>
     );
 })
+
+
 
 Cursor.displayName = "Cursor"

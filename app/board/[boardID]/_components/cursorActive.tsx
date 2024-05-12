@@ -3,6 +3,8 @@
 import { useOthersConnectionIds } from "@/liveblocks.config";
 import { memo } from "react";
 import { Cursor } from "./cursors";
+import { CanvasState } from "@/types/canvasType";
+
 
 const Cursors = () =>{
     const userIDActive = useOthersConnectionIds()

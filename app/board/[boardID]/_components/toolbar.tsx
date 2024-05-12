@@ -1,5 +1,8 @@
+'use client'
+
+import * as LucideIcons from "lucide-react";
 import { 
-    Circle, 
+    Circle,
     MousePointer2, 
     NotebookPen, 
     Pencil, 
@@ -11,7 +14,7 @@ import {
 
 import { ToolButton } from "./toolButton";
 import { CanvasMode, CanvasState, LayerType } from "@/types/canvasType";
-
+import { useHistory, useMutation } from "@/liveblocks.config";
 
 interface ToolbarProps{
     canvasState: CanvasState
@@ -30,6 +33,20 @@ const Toolbar = ({
     isUndo,
     isRedo
 }:ToolbarProps) => {
+    const history = useHistory()
+
+    const toolActive = useMutation((
+        {setMyPresence},
+        icon
+    ) => {
+        history.pause()
+
+        setMyPresence(
+            { activeTools: icon },
+            { addToHistory: true }
+        )
+    },[])
+
     return (
         <div
             className="
@@ -56,22 +73,30 @@ const Toolbar = ({
                 <ToolButton
                     label="Select"
                     icon={MousePointer2}
-                    onClick={() => setCanvasState({mode: CanvasMode.None})}
+                    onClick={() => {
+                        setCanvasState({
+                            mode: CanvasMode.None,
+                        }),
+                        toolActive(null)
+                    }}
                     isActive={
                         canvasState.mode === CanvasMode.None
                         || canvasState.mode === CanvasMode.Press
                         || canvasState.mode === CanvasMode.Select
                         || canvasState.mode === CanvasMode.Resize
-                        || canvasState.mode === CanvasMode.Translate
+                        || canvasState.mode === CanvasMode.Move
                     }
                 />
                 <ToolButton
                     label="Text"
                     icon={Type}
-                    onClick={() => setCanvasState({
-                        mode: CanvasMode.Insert,
-                        layer:LayerType.Text
-                    })}
+                    onClick={() => {   
+                        setCanvasState({
+                            mode: CanvasMode.Insert,
+                            layer:LayerType.Text,
+                        }),
+                        toolActive("Type")
+                    }}
                     isActive={
                         canvasState.mode === CanvasMode.Insert
                         && canvasState.layer === LayerType.Text
@@ -80,10 +105,13 @@ const Toolbar = ({
                 <ToolButton
                     label="Note"
                     icon={NotebookPen}
-                    onClick={() => setCanvasState({
-                        mode: CanvasMode.Insert,
-                        layer:LayerType.Note
-                    })}
+                    onClick={() => {
+                        setCanvasState({
+                            mode: CanvasMode.Insert,
+                            layer:LayerType.Note,
+                        }),
+                        toolActive("NotebookPen")
+                    }}
                     isActive={
                         canvasState.mode === CanvasMode.Insert
                         && canvasState.layer === LayerType.Note
@@ -92,10 +120,13 @@ const Toolbar = ({
                 <ToolButton
                     label="Rectangle"
                     icon={RectangleHorizontal}
-                    onClick={() => setCanvasState({
-                        mode: CanvasMode.Insert,
-                        layer:LayerType.Rectangle
-                    })}
+                    onClick={() => {
+                        setCanvasState({
+                            mode: CanvasMode.Insert,
+                            layer:LayerType.Rectangle,
+                        }),
+                        toolActive("RectangleHorizontal")
+                    }}
                     isActive={
                         canvasState.mode === CanvasMode.Insert
                         && canvasState.layer === LayerType.Rectangle
@@ -104,10 +135,13 @@ const Toolbar = ({
                 <ToolButton
                     label="Circle"
                     icon={Circle}
-                    onClick={() => setCanvasState({
-                        mode: CanvasMode.Insert,
-                        layer:LayerType.Circle
-                    })}
+                    onClick={() => {
+                        setCanvasState({
+                            mode: CanvasMode.Insert,
+                            layer:LayerType.Circle,
+                        }),
+                        toolActive("Circle")
+                    }}
                     isActive={
                         canvasState.mode === CanvasMode.Insert
                         && canvasState.layer === LayerType.Circle
@@ -116,9 +150,12 @@ const Toolbar = ({
                 <ToolButton
                     label="Pen"
                     icon={Pencil}
-                    onClick={() => setCanvasState({
-                        mode: CanvasMode.Pencil,
-                    })}
+                    onClick={() => {
+                        setCanvasState({
+                            mode: CanvasMode.Pencil,
+                        }),
+                        toolActive("Pencil")
+                    }}
                     isActive={
                         canvasState.mode === CanvasMode.Pencil
                     }
