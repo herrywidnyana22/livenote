@@ -34,7 +34,7 @@ export const PreviewLayer = memo(({
             )
 
         default:
-            console.warn("Unknown Layer type")
+            // console.warn("Unknown Layer type")
             return null
     }
 })

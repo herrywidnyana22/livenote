@@ -4,21 +4,24 @@ import * as LucideIcons from "lucide-react"
 
 import { memberOnlineColor } from "@/lib/utils"
 import { useOther } from "@/liveblocks.config";
-import { MousePointer2, LucideIcon } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 import { memo } from "react";
+import { CanvasMode, CanvasState } from "@/types/canvasType";
+
 interface CursorProps{
     connectionID: number
+    canvasState: CanvasState
 }
 
-export const Cursor = memo(({connectionID}: CursorProps) => {
+export const Cursor = memo(({connectionID, canvasState}: CursorProps) => {
     const members = useOther(connectionID, (user) => user?.info)
     const cursor = useOther(connectionID, (user) => user.presence.cursor)
     const memberToolActive = useOther(connectionID, (user) => user.presence.activeTools)
     const name = members?.name || "Team Mate"
 
-    const IconToolActive = memberToolActive ? LucideIcons[memberToolActive] as LucideIcon : undefined
+    const IconToolActive = memberToolActive ? LucideIcons[memberToolActive] as LucideIcon : null
+    // const IconToolActive = memberToolActive ? LucideIcons[memberToolActive] as LucideIcon : undefined
 
-    console.log({memberToolActive})
 
     if(!cursor){
         return null
@@ -38,7 +41,8 @@ export const Cursor = memo(({connectionID}: CursorProps) => {
                 drop-shadow-md
             "
         >
-            <MousePointer2
+            
+            <LucideIcons.MousePointer2
                 className="
                     w-5
                     h-5

@@ -5,8 +5,11 @@ import { memo } from "react";
 import { Cursor } from "./cursors";
 import { CanvasState } from "@/types/canvasType";
 
+type CursorMemberProps ={
+    canvasState: CanvasState
+}
 
-const Cursors = () =>{
+const Cursors = ({canvasState}:CursorMemberProps) =>{
     const userIDActive = useOthersConnectionIds()
 
     return(
@@ -16,6 +19,7 @@ const Cursors = () =>{
                     <Cursor
                         key={connectionID}
                         connectionID={connectionID}
+                        canvasState={canvasState}
                     />
                 ))
             }
@@ -23,12 +27,14 @@ const Cursors = () =>{
     )
 }
 
-export const CursorMember = memo(() => {
+export const CursorMember = memo(({canvasState}: CursorMemberProps) => {
     return ( 
         <>
-            <Cursors/>
+            <Cursors
+                canvasState={canvasState}
+            />
         </>
     );
 })
 
-CursorMember.displayName = "CursorActive"
+CursorMember.displayName = "CursorMember"

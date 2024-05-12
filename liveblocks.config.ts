@@ -14,7 +14,7 @@ const client = createClient({
 type Presence = {
   cursor: { x: number, y: number } | null,
   select: string[],
-  activeTools?: keyof typeof LucideIcons
+  activeTools: keyof typeof LucideIcons | null
   // ...
 };
 

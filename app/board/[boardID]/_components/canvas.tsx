@@ -9,12 +9,13 @@ import { CanvasHeader } from "./canvasHeader";
 
 import Toolbar from "./toolbar";
 import Member from "./member";
-import { CursorMember } from "./cursorActive";
+
 import { LiveObject } from "@liveblocks/client";
 import { PreviewLayer } from "./previewLayer";
 import { cn, memberOnlineColor, resizing } from "@/lib/utils";
 import SelectedBox from "./selectedBox";
 import { OptionTools } from "./tools";
+import { CursorMember } from "./cursorMember";
 
 interface CanvasProps{
     boardID: string
@@ -144,6 +145,7 @@ const Canvas = ({
         setCanvasState({
             mode: CanvasMode.Move,
             current: point
+            
         })
     },[canvasState])
 
@@ -164,6 +166,7 @@ const Canvas = ({
         // RESIZE HANDLER
         if(canvasState.mode === CanvasMode.Move){
             onMoving(current)
+            setMyPresence({ activeTools: "Grab"})
         } else if(canvasState.mode === CanvasMode.Resize){
             onResizing(current)
         }
@@ -176,7 +179,7 @@ const Canvas = ({
          setMyPresence({cursor: null})
     }, [])
 
-    const onMouseUp = useMutation(({}, e) => {
+    const onMouseUp = useMutation(({setMyPresence}, e) => {
         const point = mouseEventInCanvas(e, angle)
 
         if(
@@ -186,13 +189,21 @@ const Canvas = ({
             unSelectLayer()
             setCanvasState({
                 mode: CanvasMode.None
+            })
+            setMyPresence({
+                activeTools: null
             }) 
+
         } else if(canvasState.mode === CanvasMode.Insert){
             addLayer(canvasState.layer, point)
+            setMyPresence({activeTools: "Type"}) 
         } else {
             setCanvasState({
                 mode: CanvasMode.None
             })
+            setMyPresence({
+                activeTools: null
+            }) 
         }
 
         history.resume()
@@ -314,7 +325,9 @@ const Canvas = ({
                         onResize={onResize}
                     />
 
-                    <CursorMember/>
+                    <CursorMember
+                        canvasState={canvasState}
+                    />
                 </g>
             </svg>
         </main>
