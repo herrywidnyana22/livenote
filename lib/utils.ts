@@ -1,4 +1,4 @@
-import { Color, Point, Side, dimention } from "@/types/canvasType"
+import { Color, Layer, Point, Side, dimention } from "@/types/canvasType"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -55,4 +55,42 @@ export function resizing(
   }
 
   return result
+}
+
+
+export function findIntersectingWithRectangle(
+  layerIDData: readonly string[],
+  layerData: ReadonlyMap<string, Layer>,
+  a: Point,
+  b: Point
+){
+  const rectangle = {
+    width: Math.abs(a.x - b.x),
+    height: Math.abs(a.y - b.y),
+    x: Math.min(a.x, b.x),
+    y: Math.min(a.y, b.y),
+  }
+
+  const IDData = []
+
+  for(const layerID of layerIDData){
+    const layer = layerData.get(layerID)
+
+    if(layer == null){
+      continue
+    }
+
+    const { width, height, x, y } = layer
+
+    if(
+      rectangle.x + rectangle.width > x
+      && rectangle.x < x + width
+      && rectangle.y + rectangle.height > y
+      && rectangle.y < y + height
+    ){
+      IDData.push(layerID)
+    }
+  }
+
+  return IDData
 }

@@ -12,7 +12,7 @@ import Member from "./member";
 
 import { LiveObject } from "@liveblocks/client";
 import { PreviewLayer } from "./previewLayer";
-import { cn, memberOnlineColor, resizing } from "@/lib/utils";
+import { cn, findIntersectingWithRectangle, memberOnlineColor, resizing } from "@/lib/utils";
 import SelectedBox from "./selectedBox";
 import { OptionTools } from "./optionTools";
 import { CursorMember } from "./cursorMember";
@@ -81,6 +81,42 @@ const Canvas = ({
     
     },[lastColor])
 
+    
+    const updateMultiSelected = useMutation((
+        { storage, setMyPresence },
+        current: Point,
+        origin: Point
+    ) =>{
+        const layer = storage.get("layers").toImmutable()
+
+        setCanvasState({
+            mode: CanvasMode.Select,
+            origin,
+            current
+        })
+
+        const IDData = findIntersectingWithRectangle(layerIDS, layer, origin, current)
+
+        setMyPresence({
+            select: IDData
+        })
+    },[layerIDS])
+    
+    const multiSelect = useCallback((
+        current: Point,
+        origin: Point
+    ) => {
+        if(Math.abs(current.x - origin.x) + Math.abs(current.y - origin.y) > 5) {
+            console.log("MULTISELECT ON")
+            setCanvasState({
+                mode: CanvasMode.Select,
+                origin,
+                current
+            })
+        }
+    },[])
+
+
     const unSelectLayer = useMutation(({ self, setMyPresence })  => {
         if(self.presence.select.length > 0){
             setMyPresence(
@@ -121,7 +157,7 @@ const Canvas = ({
         }
     },[canvasState])
 
-    const onMoving = useMutation((
+    const onDrag = useMutation((
         { storage, self },
         point: Point
     ) => {
@@ -165,16 +201,21 @@ const Canvas = ({
         e.preventDefault()
         const current = mouseEventInCanvas(e, angle)
 
+        if(canvasState.mode === CanvasMode.Press) {
+            multiSelect(current, canvasState.origin)
+        } else if(canvasState.mode === CanvasMode.Select) {
+            updateMultiSelected(current, canvasState.origin)
+        }
         // RESIZE HANDLER
-        if(canvasState.mode === CanvasMode.Move){
-            onMoving(current)
+        else if(canvasState.mode === CanvasMode.Move){
+            onDrag(current)
             setMyPresence({ activeTools: "Grab"})
         } else if(canvasState.mode === CanvasMode.Resize){
             onResizing(current)
         }
 
         setMyPresence({cursor: current})
-    }, [canvasState, angle, onResizing, onMoving])
+    }, [canvasState, angle, onResizing, onDrag])
     
 
     const onMouseOut= useMutation(({setMyPresence}) =>{
@@ -198,7 +239,6 @@ const Canvas = ({
 
         } else if(canvasState.mode === CanvasMode.Insert){
             addLayer(canvasState.layer, point)
-            console.log(`Layer : ${canvasState.layer}`)
         } else {
             setCanvasState({
                 mode: CanvasMode.None
