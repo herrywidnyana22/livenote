@@ -22,7 +22,10 @@ export const Lobby = ({
             id={lobbyID}
             initialPresence={{
                 cursor: null,
-                select: []
+                select: [],
+                activeTools: null,
+                pencilDraw: null,
+                penColor: null
             }}
             initialStorage={{
                 layers: new LiveMap<string, LiveObject<Layer>>(),

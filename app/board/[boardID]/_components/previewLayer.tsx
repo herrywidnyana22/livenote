@@ -5,7 +5,10 @@ import { LayerType } from "@/types/canvasType"
 import { memo } from "react"
 import { Rectangle } from "./rectangle"
 import { Text } from "./text"
-import { Circle } from "./Circle"
+import { Note } from "./note"
+import { Drawing } from "./drawing"
+import { Circle } from "./circle"
+import { rgbToHex } from "@/lib/utils"
 
 interface PreviewLayerProps{
     id: string
@@ -50,6 +53,29 @@ export const PreviewLayer = memo(({
                     id={id}
                     layer={layer}
                     onMousePress={onMousePress}
+                    selectedColor={selectedColor}
+                />
+            )
+
+        case LayerType.Note:
+            return(
+                <Note
+                    id={id}
+                    layer={layer}
+                    onMousePress={onMousePress}
+                    selectedColor={selectedColor}
+                />
+            )
+
+        case LayerType.Drawing:
+            return(
+                <Drawing
+                    key={id}
+                    x={layer.x}
+                    y={layer.y}
+                    point={layer.point}
+                    onMousePress={(e) => onMousePress(e, id)}
+                    fill={layer.fill ? rgbToHex(layer.fill) : "#000"}
                     selectedColor={selectedColor}
                 />
             )

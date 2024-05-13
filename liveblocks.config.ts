@@ -1,6 +1,6 @@
 import { LiveList, LiveMap, LiveObject, createClient } from "@liveblocks/client";
 import { createRoomContext, createLiveblocksContext } from "@liveblocks/react";
-import { Layer } from "./types/canvasType";
+import { Color, Layer } from "./types/canvasType";
 import * as LucideIcons from "lucide-react";
   
 const client = createClient({
@@ -15,6 +15,8 @@ type Presence = {
   cursor: { x: number, y: number } | null,
   select: string[],
   activeTools: keyof typeof LucideIcons | null
+  pencilDraw: [x: number, y: number, pressure: number][] | null
+  penColor: Color | null
   // ...
 };
 

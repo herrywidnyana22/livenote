@@ -1,4 +1,4 @@
-import { Color, Layer, Point, Side, dimention } from "@/types/canvasType"
+import { Color, DrawingLayer, Layer, LayerType, Point, Side, dimention } from "@/types/canvasType"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -101,9 +101,8 @@ export const calculateBrightness = (color: Color) => {
   return luminance
 }
 
-export const calculateFontSize = (width: number, height: number) =>{
+export const calculateFontSize = (width: number, height: number, scale: number) =>{
   const maxSize = 96
-  const scale = 0.5
 
   const sizeBasedOnWidth = width * scale
   const sizeBasedOnHeight = height * scale
@@ -111,4 +110,58 @@ export const calculateFontSize = (width: number, height: number) =>{
   const fontSize = Math.min(sizeBasedOnWidth, sizeBasedOnHeight, maxSize)
 
   return fontSize
+}
+
+export function penPointToLayer(
+  point: number[][],
+  color: Color
+): DrawingLayer{
+  if (point.length < 2){
+    throw new Error('Cannot draw point with less than 2 points')
+  }
+
+  let top = Number.POSITIVE_INFINITY
+  let bottom = Number.NEGATIVE_INFINITY
+  let right = Number.NEGATIVE_INFINITY
+  let left = Number.POSITIVE_INFINITY
+
+  for (const coordinat of point){
+    const [x, y] = coordinat
+
+    if (top>y) top = y
+    if (bottom<y) bottom = y
+    if (left>x) left = x
+    if (right<x) right = x
+  }
+
+  return{
+    type: LayerType.Drawing,
+    x: left,
+    y: top,
+    width: right - left,
+    height: bottom - top,
+    fill: color,
+    point: point.map(([x, y, pressure]) => [
+      x-left,
+      y-top,
+      pressure
+    ])
+  }
+}
+
+export function getDrawingStroke(stroke: number[][]){
+  if (!stroke.length) return ""
+
+  const d = stroke.reduce(
+    (acc, [x0, y0], i, arr) => {
+      const [x1, y1] = arr[(i+1) % arr.length]
+      acc.push(x0, y0, (x0+x1)/2, (y0+y1)/2)
+
+      return acc
+    }, ["M", ...stroke[0], "Q"]
+  )
+
+  d.push("Z")
+
+  return d.join(" ")
 }

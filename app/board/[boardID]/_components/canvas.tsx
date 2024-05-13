@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useMemo, useState } from "react";
-import { useCanRedo, useCanUndo, useHistory, useMutation, useOthersMapped, useStorage } from "@/liveblocks.config";
+import { useCanRedo, useCanUndo, useHistory, useMutation, useOthersMapped, useSelf, useStorage } from "@/liveblocks.config";
 import { nanoid } from "nanoid"
 import { Angle, CanvasMode, CanvasState, Color, LayerType, Point, Side, dimention, mouseEventInCanvas } from "@/types/canvasType";
 
@@ -12,11 +12,12 @@ import Member from "./member";
 
 import { LiveObject } from "@liveblocks/client";
 import { PreviewLayer } from "./previewLayer";
-import { cn, findIntersectingWithRectangle, memberOnlineColor, resizing } from "@/lib/utils";
+import { cn, findIntersectingWithRectangle, memberOnlineColor, penPointToLayer, resizing, rgbToHex } from "@/lib/utils";
 import SelectedBox from "./selectedBox";
 import { OptionTools } from "./optionTools";
 import { CursorMember } from "./cursorMember";
 import { toast } from "sonner";
+import { Drawing } from "./drawing";
 
 interface CanvasProps{
     boardID: string
@@ -48,6 +49,8 @@ const Canvas = ({
 
      // LAYERING
     const layerIDS = useStorage((root) => root.layerID)
+    const pencilTool = useSelf((me) => me.presence.pencilDraw)
+    
     const addLayer = useMutation((
         {storage, setMyPresence},
         LayerType: LayerType.Circle
@@ -115,6 +118,73 @@ const Canvas = ({
         }
     },[])
 
+    const startDrawing = useMutation((
+        {setMyPresence},
+        point: Point,
+        pressure: number
+    ) => {
+       setMyPresence({
+        pencilDraw: [[point.x, point.y, pressure]],
+        penColor: lastColor
+       }) 
+    },[lastColor])
+
+    const onDrawing = useMutation((
+        { setMyPresence, self },
+        point: Point,
+        e: React.PointerEvent
+    ) => {
+        const { pencilDraw } = self.presence
+
+        if(
+            canvasState.mode !== CanvasMode.Pencil
+            || e.buttons !== 1
+            || pencilDraw == null
+        ) return
+
+        setMyPresence({
+            cursor: point,
+            pencilDraw: 
+                pencilDraw.length === 1
+                && pencilDraw[0][0] === point.x
+                && pencilDraw[0][1] === point.y
+                ? pencilDraw
+                : [...pencilDraw, [point.x, point.y, e.pressure]]
+            
+        })
+
+    },[canvasState.mode])
+
+    const insertDrawing = useMutation(({storage, self, setMyPresence}) =>{
+        const liveLayerData = storage.get("layers")
+        const liveLayerIDData = storage.get("layerID")
+
+        const { pencilDraw } = self.presence
+
+        if (pencilDraw == null 
+            || pencilDraw.length < 2 
+            || liveLayerData.size >= MAX_LAYER
+        ){
+            setMyPresence({
+                pencilDraw: null
+            })
+
+            return
+        }
+
+        const id = nanoid()
+
+        liveLayerData.set(
+            id,
+            new LiveObject(penPointToLayer(pencilDraw, lastColor))
+        )
+        liveLayerIDData.push(id)
+
+        setMyPresence({pencilDraw: null})
+        setCanvasState({mode: CanvasMode.Pencil})
+
+        
+    },[lastColor])
 
     const unSelectLayer = useMutation(({ self, setMyPresence })  => {
         if(self.presence.select.length > 0){
@@ -212,9 +282,21 @@ const Canvas = ({
         } else if(canvasState.mode === CanvasMode.Resize){
             onResizing(current)
         }
+        
+        else if(canvasState.mode === CanvasMode.Pencil){
+            onDrawing(current, e)
+        }
 
         setMyPresence({cursor: current})
-    }, [canvasState, angle, onResizing, onDrag])
+    }, [
+        canvasState, 
+        angle, 
+        onResizing, 
+        onDrag, 
+        onDrawing, 
+        multiSelect, 
+        updateMultiSelected
+    ])
     
 
     const onMouseOut= useMutation(({setMyPresence}) =>{
@@ -234,8 +316,10 @@ const Canvas = ({
             })
             setMyPresence({
                 activeTools: null
-            }) 
+            })
 
+        } else if (canvasState.mode === CanvasMode.Pencil) {
+            insertDrawing()
         } else if(canvasState.mode === CanvasMode.Insert){
             addLayer(canvasState.layer, point)
         } else {
@@ -248,7 +332,15 @@ const Canvas = ({
         }
 
         history.resume()
-    },[angle, canvasState, history, addLayer, unSelectLayer])
+    },[
+        setCanvasState,
+        angle, 
+        canvasState, 
+        history, 
+        addLayer, 
+        unSelectLayer,
+        insertDrawing
+    ])
 
     const onMousePress = useCallback((e: React.PointerEvent) =>{
         const point = mouseEventInCanvas(e, angle)
@@ -256,13 +348,17 @@ const Canvas = ({
         if(canvasState.mode === CanvasMode.Insert){
             return
         }
-        // TODO: ADD CASE DRAWING
+        
+        if(canvasState.mode === CanvasMode.Pencil){
+            startDrawing(point, e.pressure)
+            return
+        }
 
         setCanvasState({
             origin: point,
             mode: CanvasMode.Press
         })
-    },[canvasState, angle])
+    },[canvasState, angle, startDrawing])
 
     const onMouseSelectItem = useMutation((
         {self, setMyPresence},
@@ -390,6 +486,14 @@ const Canvas = ({
                     <CursorMember
                         canvasState={canvasState}
                     />
+                    {pencilTool !== null && pencilTool.length > 0 && (
+                        <Drawing
+                            point={pencilTool}
+                            fill={rgbToHex(lastColor)}
+                            x={0}
+                            y={0}
+                        />
+                    )}
                 </g>
             </svg>
         </main>

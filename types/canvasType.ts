@@ -85,7 +85,7 @@ export type DrawingLayer = {
     x: number
     y: number
     fill: Color
-    points: number[][]
+    point: number[][]
     value?: string
 }
 

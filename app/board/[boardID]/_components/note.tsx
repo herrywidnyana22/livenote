@@ -2,8 +2,8 @@
 
 import ContentEditable, { ContentEditableEvent } from "react-contenteditable"
 import { Kalam } from "next/font/google"
-import { TextLayer } from "@/types/canvasType"
-import { calculateFontSize, cn, rgbToHex } from "@/lib/utils"
+import { NoteLayer } from "@/types/canvasType"
+import { calculateBrightness, calculateFontSize, cn, rgbToHex } from "@/lib/utils"
 import { useMutation } from "@/liveblocks.config"
 
 const font = Kalam({
@@ -11,18 +11,18 @@ const font = Kalam({
     weight: ["400"]
 })
 
-type TextProps = {
+type NoteProps = {
     id: string
-    layer: TextLayer
+    layer: NoteLayer
     onMousePress: (e:React.PointerEvent, id: string) => void
     selectedColor?: string
 }
-export const Text = ({
+export const Note = ({
     id,
     layer,
     onMousePress,
     selectedColor
-}: TextProps) => {
+}: NoteProps) => {
 
     const {
         x,
@@ -43,6 +43,9 @@ export const Text = ({
 
     },[])
 
+    const luminanceThreshold = 0.7
+    const textColor = fill ? (calculateBrightness(fill) > luminanceThreshold ? 'black' : 'white') : 'black'
+
     const handleEditText = (e:ContentEditableEvent) =>{
         updateValue(e.target.value)
     }
@@ -55,15 +58,20 @@ export const Text = ({
             y={y}
             onPointerDown={(e) => onMousePress(e, id)}
             style={{
-                outline: selectedColor ? `1px solid ${selectedColor}` : "none"
+                outline: selectedColor ? `1px solid ${selectedColor}` : "none",
+                backgroundColor: fill ? rgbToHex(fill) : "#000"
             }}
+            className="
+                shadow-md
+                drop-shadow-xl
+            "
         >
             <ContentEditable
                 html={value || "Text"}
                 onChange={handleEditText}
                 style={{
-                    fontSize: calculateFontSize(width, height, 0.5),
-                    color: fill ? rgbToHex(fill) :  "#000"
+                    fontSize: calculateFontSize(width, height, 0.15),
+                    color: textColor
                 }}
                 className={cn(`
                     w-full
@@ -72,7 +80,6 @@ export const Text = ({
                     justify-center
                     items-center
                     text-center
-                    drop=shadow-md
                     outline-none`,
                     font.className
                     
