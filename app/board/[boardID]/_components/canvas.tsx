@@ -486,14 +486,18 @@ const Canvas = ({
                     <CursorMember
                         canvasState={canvasState}
                     />
-                    {pencilTool !== null && pencilTool.length > 0 && (
-                        <Drawing
-                            point={pencilTool}
-                            fill={rgbToHex(lastColor)}
-                            x={0}
-                            y={0}
-                        />
-                    )}
+                    {
+                        pencilTool !== null 
+                        && pencilTool.length > 0 
+                        && (
+                            <Drawing
+                                point={pencilTool}
+                                fill={rgbToHex(lastColor)}
+                                x={0}
+                                y={0}
+                            />
+                        )
+                    }
                 </g>
             </svg>
         </main>
