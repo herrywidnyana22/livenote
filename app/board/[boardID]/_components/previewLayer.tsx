@@ -1,14 +1,15 @@
 'use client'
 
-import { useStorage } from "@/liveblocks.config"
-import { LayerType } from "@/types/canvasType"
 import { memo } from "react"
+import { rgbToHex } from "@/lib/utils"
+import { LayerType } from "@/types/canvasType"
 import { Rectangle } from "./rectangle"
+import { useStorage } from "@/liveblocks.config"
+
 import { Text } from "./text"
 import { Note } from "./note"
-import { Drawing } from "./drawing"
 import { Circle } from "./circle"
-import { rgbToHex } from "@/lib/utils"
+import { Drawing } from "./drawing"
 
 interface PreviewLayerProps{
     id: string

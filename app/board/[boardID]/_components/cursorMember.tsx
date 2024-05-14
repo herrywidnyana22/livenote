@@ -1,12 +1,13 @@
 'use client'
 
-import { useOthersConnectionIds, useOthersMapped } from "@/liveblocks.config";
 import { memo } from "react";
-import { Cursor } from "./cursors";
-import { CanvasState } from "@/types/canvasType";
 import { shallow } from "@liveblocks/client";
-import { Drawing } from "./drawing";
 import { rgbToHex } from "@/lib/utils";
+import { CanvasState } from "@/types/canvasType";
+import { useOthersConnectionIds, useOthersMapped } from "@/liveblocks.config";
+
+import { Cursor } from "./cursors";
+import { Drawing } from "./drawing";
 
 type CursorMemberProps ={
     canvasState: CanvasState

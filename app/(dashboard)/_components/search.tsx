@@ -1,11 +1,13 @@
 'use client'
 
-import { Input } from "@/components/ui/input";
+import qs from "query-string"
+
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
 
-import qs from "query-string"
+import { Input } from "@/components/ui/input";
+
 
 export const SearchInput = () => {
     const [value, setValue] = useState("")

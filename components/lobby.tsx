@@ -1,10 +1,10 @@
 'use client'
 
-import { ReactNode } from "react"
-import { ClientSideSuspense } from "@liveblocks/react"
-import { RoomProvider } from "@/liveblocks.config"
-import { LiveList, LiveMap, LiveObject } from "@liveblocks/client"
 import { Layer } from "@/types/canvasType"
+import { ReactNode } from "react"
+import { RoomProvider } from "@/liveblocks.config"
+import { ClientSideSuspense } from "@liveblocks/react"
+import { LiveList, LiveMap, LiveObject } from "@liveblocks/client"
 
 
 interface LobbyProps {

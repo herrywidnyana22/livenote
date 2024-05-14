@@ -1,13 +1,14 @@
 'use client'
 
+import { memo } from "react"
+import { Angle, Color } from "@/types/canvasType"
+import { useDeleteLayer } from "@/hooks/useDeleteLayer"
 import { useSelectedResize } from "@/hooks/useSelectedResize"
 import { useMutation, useSelf } from "@/liveblocks.config"
-import { Angle, Color } from "@/types/canvasType"
-import { memo } from "react"
-import { useDeleteLayer } from "@/hooks/useDeleteLayer"
+import { ArrowBigDownDash, ArrowBigUpDash, Trash2 } from "lucide-react"
+
 import { Info } from "@/components/info"
 import { Button } from "@/components/ui/button"
-import { ArrowBigDownDash, ArrowBigUpDash, Trash2 } from "lucide-react"
 import { ColorOptions } from "./ColorOption"
 
 interface OptionToolsprops{

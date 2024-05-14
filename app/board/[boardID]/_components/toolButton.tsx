@@ -1,8 +1,9 @@
 'use client'
 
+import { LucideIcon } from "lucide-react"
+
 import { Info } from "@/components/info"
 import { Button } from "@/components/ui/button"
-import { LucideIcon } from "lucide-react"
 
 interface ToolButtonProps{
     label: string

@@ -1,20 +1,23 @@
 'use client'
 
-import { font } from "@/app/(dashboard)/_components/font"
-import { Input } from "@/app/(dashboard)/_components/input"
-import Actions from "@/components/actions"
-import { Info } from "@/components/info"
-import { Button } from "@/components/ui/button"
-import { api } from "@/convex/_generated/api"
-import { Id } from "@/convex/_generated/dataModel"
-import { useHookMutation } from "@/hooks/useMutation"
+import Link from "next/link"
+import Image from "next/image"
+
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
+import { useState } from "react"
 import { useQuery } from "convex/react"
 import { Check, Loader2, Menu, X } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { useState } from "react"
-import { toast } from "sonner"
+
+import { Id } from "@/convex/_generated/dataModel"
+import { api } from "@/convex/_generated/api"
+import { useHookMutation } from "@/hooks/useMutation"
+
+import { Info } from "@/components/info"
+import { font } from "@/app/(dashboard)/_components/font"
+import { Input } from "@/app/(dashboard)/_components/input"
+import { Button } from "@/components/ui/button"
+import { Actions } from "@/components/actions"
 
 interface CanvasHeaderProps{
     boardID: string

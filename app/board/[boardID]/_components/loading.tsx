@@ -1,13 +1,10 @@
 
 import { Loader } from "lucide-react";
-import { CanvasHeaderSkeleton } from "./canvasHeader";
 import { MemberSkeleton } from "./member";
 import { ToolbarSkeleton } from "./toolbar";
+import { CanvasHeaderSkeleton } from "./canvasHeader";
 
-type Props = {
- 
-}
-export const Loading = ({}: Props) => {
+export const Loading = () => {
     return ( 
         <main
             className="

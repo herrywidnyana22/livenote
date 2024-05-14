@@ -1,13 +1,15 @@
 'use client'
 
+import { toast } from "sonner"
+import { api } from "@/convex/_generated/api"
+import { Link2, Pencil, Trash2 } from "lucide-react"
+import { useHookMutation } from "@/hooks/useMutation"
+
 import { DropdownMenuContentProps } from "@radix-ui/react-dropdown-menu"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Link2, Pencil, Trash2 } from "lucide-react"
-import { toast } from "sonner"
-import { useHookMutation } from "@/hooks/useMutation"
-import { api } from "@/convex/_generated/api"
-import { AlertModal } from "./alertModal"
+
 import { Button } from "./ui/button"
+import { AlertModal } from "./alertModal"
 
 interface ActionProps{
     id: string
@@ -17,7 +19,7 @@ interface ActionProps{
     setEditedData?: any
 }
 
-const Actions = ({
+export const Actions = ({
     id,
     children,
     side,
@@ -122,5 +124,3 @@ const Actions = ({
         </DropdownMenu>
     );
 }
- 
-export default Actions;

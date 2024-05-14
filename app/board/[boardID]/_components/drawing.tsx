@@ -2,8 +2,7 @@
 
 import getStroke from "perfect-freehand"
 
-import { getDrawingStroke, rgbToHex } from "@/lib/utils"
-import { DrawingLayer } from "@/types/canvasType"
+import { getDrawingStroke } from "@/lib/utils"
 
 type DrawingProps = { 
     x: number

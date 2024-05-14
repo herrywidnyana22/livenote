@@ -1,23 +1,21 @@
 'use client'
 
+import { toast } from "sonner";
+import { nanoid } from "nanoid"
+import { LiveObject } from "@liveblocks/client";
 import { useCallback, useMemo, useState } from "react";
 import { useCanRedo, useCanUndo, useHistory, useMutation, useOthersMapped, useSelf, useStorage } from "@/liveblocks.config";
-import { nanoid } from "nanoid"
+import { cn, findIntersectingWithRectangle, memberOnlineColor, penPointToLayer, resizing, rgbToHex } from "@/lib/utils";
 import { Angle, CanvasMode, CanvasState, Color, LayerType, Point, Side, dimention, mouseEventInCanvas } from "@/types/canvasType";
 
-import { CanvasHeader } from "./canvasHeader";
-
-import Toolbar from "./toolbar";
-import Member from "./member";
-
-import { LiveObject } from "@liveblocks/client";
-import { PreviewLayer } from "./previewLayer";
-import { cn, findIntersectingWithRectangle, memberOnlineColor, penPointToLayer, resizing, rgbToHex } from "@/lib/utils";
-import SelectedBox from "./selectedBox";
-import { OptionTools } from "./optionTools";
-import { CursorMember } from "./cursorMember";
-import { toast } from "sonner";
+import { Member } from "./member";
 import { Drawing } from "./drawing";
+import { Toolbar } from "./toolbar";
+import { SelectedBox } from "./selectedBox";
+import { OptionTools } from "./optionTools";
+import { CanvasHeader } from "./canvasHeader";
+import { PreviewLayer } from "./previewLayer";
+import { CursorMember } from "./cursorMember";
 
 interface CanvasProps{
     boardID: string

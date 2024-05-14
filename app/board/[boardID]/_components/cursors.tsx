@@ -2,11 +2,11 @@
 
 import * as LucideIcons from "lucide-react"
 
-import { memberOnlineColor } from "@/lib/utils"
+import { memo } from "react";
 import { useOther } from "@/liveblocks.config";
 import { LucideIcon } from "lucide-react";
-import { memo } from "react";
-import { CanvasMode, CanvasState } from "@/types/canvasType";
+import { CanvasState } from "@/types/canvasType";
+import { memberOnlineColor } from "@/lib/utils"
 
 interface CursorProps{
     connectionID: number

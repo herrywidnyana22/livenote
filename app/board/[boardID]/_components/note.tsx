@@ -1,10 +1,11 @@
 'use client'
 
 import ContentEditable, { ContentEditableEvent } from "react-contenteditable"
+
 import { Kalam } from "next/font/google"
 import { NoteLayer } from "@/types/canvasType"
-import { calculateBrightness, calculateFontSize, cn, rgbToHex } from "@/lib/utils"
 import { useMutation } from "@/liveblocks.config"
+import { calculateBrightness, calculateFontSize, cn, rgbToHex } from "@/lib/utils"
 
 const font = Kalam({
     subsets: ["latin"],

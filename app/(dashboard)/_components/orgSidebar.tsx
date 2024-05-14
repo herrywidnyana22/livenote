@@ -1,14 +1,15 @@
 'use client'
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { OrganizationSwitcher } from "@clerk/nextjs";
-import { LayoutDashboard, Star } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-
 import Link from "next/link";
 import Image from "next/image";
+
+import { cn } from "@/lib/utils";
 import { font } from "./font";
+import { useSearchParams } from "next/navigation";
+import { OrganizationSwitcher } from "@clerk/nextjs";
+import { LayoutDashboard, Star } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 
 export const OrgSidebar = () => {
 

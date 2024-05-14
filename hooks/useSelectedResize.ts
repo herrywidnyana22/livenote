@@ -1,6 +1,6 @@
-import { useSelf, useStorage } from "@/liveblocks.config";
-import { Layer, dimention } from "@/types/canvasType";
 import { shallow } from "@liveblocks/client";
+import { Layer, dimention } from "@/types/canvasType";
+import { useSelf, useStorage } from "@/liveblocks.config";
 
 const resizeBox = (layers: Layer[]): dimention | null =>{
     const firstLayer = layers[0]

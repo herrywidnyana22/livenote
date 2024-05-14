@@ -1,8 +1,8 @@
 'use client'
 
-import { calculateBrightness, rgbToHex } from "@/lib/utils";
 import { Color } from "@/types/canvasType";
 import { Check } from "lucide-react";
+import { calculateBrightness, rgbToHex } from "@/lib/utils";
 
 type ColorOptionsProps = {
     onChange: (color: Color) => void

@@ -1,6 +1,6 @@
-import { Color, DrawingLayer, Layer, LayerType, Point, Side, dimention } from "@/types/canvasType"
-import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { type ClassValue, clsx } from "clsx"
+import { Color, DrawingLayer, Layer, LayerType, Point, Side, dimention } from "@/types/canvasType"
 
 const COLORS = [
   "#dc2626",

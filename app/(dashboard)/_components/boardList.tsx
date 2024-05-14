@@ -3,11 +3,13 @@
 import EmptyBoardListState from "./state/emptyBoardList"
 import EmptyFavoriteState from "./state/emptyFavoriteState"
 import EmptySearchState from "./state/emptySearchState"
-import { useQuery } from "convex/react"
+
 import { api } from "@/convex/_generated/api"
+import { useState } from "react"
+import { useQuery } from "convex/react"
+
 import { BoardCard } from "./card/boardCard"
 import { NewBoard } from "./newBoard"
-import { useState } from "react"
 
 type BoardListProps = {
     orgID: string

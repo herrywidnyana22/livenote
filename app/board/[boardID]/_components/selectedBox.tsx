@@ -1,9 +1,9 @@
 'use client'
 
+import { memo } from "react"
 import { useSelectedResize } from "@/hooks/useSelectedResize"
 import { useSelf, useStorage } from "@/liveblocks.config"
 import { LayerType, Side, dimention } from "@/types/canvasType"
-import { memo } from "react"
 
 interface SelectedBoxProps{
     onResize: (corner: Side, initialBounds: dimention)=> void
@@ -11,7 +11,7 @@ interface SelectedBoxProps{
 
 const HANDLE_WIDTH = 8
 
-const SelectedBox = memo(({
+export const SelectedBox = memo(({
     onResize
 }: SelectedBoxProps) => {
     const thisLayerID = useSelf((me) => 
@@ -229,7 +229,5 @@ const SelectedBox = memo(({
         </>
     )
 })
-
-export default SelectedBox
 
 SelectedBox.displayName = "SelectedBox"

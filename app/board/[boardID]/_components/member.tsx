@@ -1,16 +1,17 @@
 'use client'
 
-import { useOthers,useSelf } from "@/liveblocks.config";
-import { UserAvatar } from "./userAvatar";
-import { Minimize2 } from "lucide-react";
-import { Info } from "@/components/info";
-import { memberOnlineColor } from "@/lib/utils";
 import { useState } from "react";
+import { Minimize2 } from "lucide-react";
+import { useOthers,useSelf } from "@/liveblocks.config";
+import { memberOnlineColor } from "@/lib/utils";
+
+import { Info } from "@/components/info";
 import { Separator } from "@/components/ui/separator";
+import { UserAvatar } from "./userAvatar";
 
 
 
-const Member = () => {
+export const Member = () => {
     const [isExpand, setIsExpand] = useState(false)
 
     const maxUserList = 1
@@ -247,8 +248,6 @@ const Member = () => {
         </div>
     );
 }
- 
-export default Member
 
 export const MemberSkeleton = () =>{
     return(

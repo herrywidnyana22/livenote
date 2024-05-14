@@ -1,6 +1,5 @@
 'use client'
 
-import * as LucideIcons from "lucide-react";
 import { 
     Circle,
     MousePointer2, 
@@ -13,8 +12,8 @@ import {
 } from "lucide-react";
 
 import { ToolButton } from "./toolButton";
-import { CanvasMode, CanvasState, LayerType } from "@/types/canvasType";
 import { useHistory, useMutation } from "@/liveblocks.config";
+import { CanvasMode, CanvasState, LayerType } from "@/types/canvasType";
 
 interface ToolbarProps{
     canvasState: CanvasState
@@ -25,7 +24,7 @@ interface ToolbarProps{
     isRedo: boolean
 }
 
-const Toolbar = ({
+export const Toolbar = ({
     canvasState,
     setCanvasState,
     undo,
@@ -188,8 +187,6 @@ const Toolbar = ({
         </div>
     );
 }
- 
-export default Toolbar;
 
 export const ToolbarSkeleton =() =>{
     return(
