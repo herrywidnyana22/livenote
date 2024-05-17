@@ -22,7 +22,7 @@ export const Text = ({
     id,
     layer,
     onMousePress,
-    selectedColor
+    selectedColor,
 }: TextProps) => {
 
     const {
@@ -31,7 +31,14 @@ export const Text = ({
         width,
         height,
         fill,
-        value
+        value,
+        textColor,
+        textAlign,
+        textSize,
+        isBold,
+        isItalic,
+        isUnderline,
+        fontType
     } = layer
 
     const updateValue = useMutation((
@@ -64,18 +71,17 @@ export const Text = ({
                 onChange={handleEditText}
                 style={{
                     fontSize: calculateFontSize(width, height, 0.5),
-                    color: fill ? rgbToHex(fill) :  "#000"
+                    color: fill ? rgbToHex(fill) :  "#000",
+                    textAlign: textAlign,
+                    fontWeight: isBold ? 'bold' : 'normal',
+                    fontStyle: isItalic ? 'italic' : 'normal',
+                    textDecoration: isUnderline ? 'underline' : 'none'
                 }}
                 className={cn(`
                     w-full
                     h-full
-                    flex
-                    justify-center
-                    items-center
-                    text-center
-                    drop=shadow-md
-                    outline-none`,
-                    font.className
+                    drop=shadow-md`,
+                    // font.className
                     
                 )}
             />      

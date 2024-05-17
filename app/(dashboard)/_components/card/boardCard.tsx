@@ -1,15 +1,16 @@
 'use client'
 
-import Image from "next/image"
 import Link from "next/link"
-import { OverlayEffect } from "./overlay"
+import Image from "next/image"
+
 import { useAuth } from "@clerk/nextjs"
-import { formatDistanceToNow } from "date-fns"
-import { FooterCard } from "./footerCard"
-import { Skeleton } from "@/components/ui/skeleton"
-import Actions from "@/components/actions"
+import { OverlayEffect } from "./overlay"
 import { MoreHorizontal } from "lucide-react"
-import { useState } from "react"
+import { formatDistanceToNow } from "date-fns"
+
+import { Actions } from "@/components/actions"
+import { Skeleton } from "@/components/ui/skeleton"
+import { FooterCard } from "./footerCard"
 
 interface BoardCardProps{
     id: string

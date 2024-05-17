@@ -2,11 +2,12 @@
 
 import { toast } from "sonner";
 import { nanoid } from "nanoid"
-import { LiveObject } from "@liveblocks/client";
-import { useCallback, useMemo, useState } from "react";
+import { LiveObject } from "@liveblocks/core";
+import { useDisableScroll } from "@/hooks/useDisableScroll";
+import { KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useCanRedo, useCanUndo, useHistory, useMutation, useOthersMapped, useSelf, useStorage } from "@/liveblocks.config";
 import { cn, findIntersectingWithRectangle, memberOnlineColor, penPointToLayer, resizing, rgbToHex } from "@/lib/utils";
-import { Angle, CanvasMode, CanvasState, Color, LayerType, Point, Side, dimention, mouseEventInCanvas } from "@/types/canvasType";
+import { Angle, CanvasMode, CanvasState, CircleLayer, Color, DrawingLayer, Layer, LayerType, NoteLayer, Point, RectangleLayer, Side, TextAlign, TextLayer, dimention, mouseEventInCanvas } from "@/types/canvasType";
 
 import { Member } from "./member";
 import { Drawing } from "./drawing";
@@ -16,6 +17,7 @@ import { OptionTools } from "./optionTools";
 import { CanvasHeader } from "./canvasHeader";
 import { PreviewLayer } from "./previewLayer";
 import { CursorMember } from "./cursorMember";
+import { useDeleteLayer } from "@/hooks/useDeleteLayer";
 
 interface CanvasProps{
     boardID: string
@@ -29,6 +31,7 @@ const Canvas = ({
     const [canvasState, setCanvasState] = useState<CanvasState>({
         mode: CanvasMode.None
     })
+
 
     const [lastColor, setLastColor] = useState<Color>({
         r: 171,
@@ -45,42 +48,78 @@ const Canvas = ({
     const isUndo = useCanUndo()
     const isRedo = useCanRedo()
 
+    
+    useDisableScroll()
+    
+    // DEFAULT COLOR
+    const currentUser = useSelf()
+    const defaultColor = memberOnlineColor(currentUser.connectionId)
+
      // LAYERING
     const layerIDS = useStorage((root) => root.layerID)
     const pencilTool = useSelf((me) => me.presence.pencilDraw)
-    
-    const addLayer = useMutation((
-        {storage, setMyPresence},
-        LayerType: LayerType.Circle
-                | LayerType.Rectangle
-                | LayerType.Note
-                | LayerType.Text,
-        position: Point
-    ) =>{
-        const liveLayer = storage.get("layers")
 
-        if(liveLayer.size >= MAX_LAYER){
-            toast.error("Cannot add item, you can only add 50 items...!")
-            return
+    const addLayer = useMutation((
+        { storage, setMyPresence },
+        layerType: LayerType,
+        position: { x: number, y: number }
+    ) => {
+        const liveLayer = storage.get("layers");
+
+        if (liveLayer.size >= MAX_LAYER) {
+            toast.error("Cannot add item, you can only add 50 items...!");
+            return;
         }
 
-        const liveLayerID = storage.get("layerID")
-        const layerID = nanoid()
-        const layer = new LiveObject({
-            type: LayerType,
+        const liveLayerID = storage.get("layerID");
+        const layerID = nanoid();
+        const baseLayerProps = {
             width: 100,
             height: 100,
             x: position.x,
             y: position.y,
-            fill: lastColor
-        })
-        
-        liveLayerID.push(layerID)
-        liveLayer.set(layerID, layer)   
+            fill: lastColor,
+            textAlign: "center" as TextAlign | "center",
+            textColor: defaultColor,
+            isBold: false,
+            isItalic: false,
+            isUnderline: false
+        }
 
-        setMyPresence({select: [layerID]}, {addToHistory: true})
-    
-    },[lastColor])
+        let layer: LiveObject<Layer>;
+        if (layerType === LayerType.Text) {
+            layer = new LiveObject<TextLayer>({
+                ...baseLayerProps,
+                type: LayerType.Text
+            })
+        } else if (layerType === LayerType.Note) {
+            layer = new LiveObject<NoteLayer>({
+                ...baseLayerProps,
+                type: LayerType.Note
+            })
+        } else if (layerType === LayerType.Rectangle) {
+            layer = new LiveObject<RectangleLayer>({
+                ...baseLayerProps,
+                type: LayerType.Rectangle
+            })
+        } else if (layerType === LayerType.Circle) {
+            layer = new LiveObject<CircleLayer>({
+                ...baseLayerProps,
+                type: LayerType.Circle
+            })
+        } else {
+            layer = new LiveObject<DrawingLayer>({
+                ...baseLayerProps,
+                type: LayerType.Drawing,
+                point: []
+            })
+        }
+
+        liveLayerID.push(layerID);
+        liveLayer.set(layerID, layer);
+
+        setMyPresence({ select: [layerID] }, { addToHistory: true });
+    }, [lastColor]);
 
     
     const updateMultiSelected = useMutation((
@@ -403,6 +442,39 @@ const Canvas = ({
 
         return memberColor
     },[selected])
+
+    const deleteLayer = useDeleteLayer()
+
+    useEffect(() => {
+        function onkeydown(e: any){
+            switch(e.key){
+                case "Delete": {
+                    deleteLayer()
+                    break
+                }
+
+                case "z": {
+                    if(e.ctrlKey || e.metaKey){
+                        e.preventDefault()
+                        if(e.shiftKey){
+                            history.redo()
+                        } else{
+                            history.undo()
+                        }
+                    }
+
+                    break
+                }
+            }
+        }
+
+        document.addEventListener("keydown", onkeydown)
+
+        return () => {
+            document.removeEventListener("keydown", onkeydown)
+        }
+    },[deleteLayer, history])
+
     
     return (
         <main

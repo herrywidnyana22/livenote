@@ -17,12 +17,14 @@ type NoteProps = {
     layer: NoteLayer
     onMousePress: (e:React.PointerEvent, id: string) => void
     selectedColor?: string
+    alignment?: string
 }
 export const Note = ({
     id,
     layer,
     onMousePress,
-    selectedColor
+    selectedColor,
+    alignment
 }: NoteProps) => {
 
     const {
@@ -72,15 +74,14 @@ export const Note = ({
                 onChange={handleEditText}
                 style={{
                     fontSize: calculateFontSize(width, height, 0.15),
-                    color: textColor
+                    color: textColor,
+                    textAlign: "center"
                 }}
                 className={cn(`
                     w-full
                     h-full
                     flex
-                    justify-center
                     items-center
-                    text-center
                     outline-none`,
                     font.className
                     

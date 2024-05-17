@@ -20,7 +20,7 @@ interface PreviewLayerProps{
 export const PreviewLayer = memo(({
     id,
     onMousePress,
-    selectedColor
+    selectedColor,
 }: PreviewLayerProps) => {
     
     const layer = useStorage((home) => home.layers.get(id))

@@ -25,7 +25,7 @@ type Presence = {
 // LiveList, LiveMap, LiveObject instances, for which updates are
 // automatically persisted and synced to all connected clients.
 type Storage = {
-  layers: LiveMap<string, LiveObject<Layer>>
+  layers: LiveMap<string, LiveObject<Layer> >
   layerID: LiveList<string>
 };
 

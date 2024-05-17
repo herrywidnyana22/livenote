@@ -104,10 +104,10 @@ export const calculateBrightness = (color: Color) => {
 export const calculateFontSize = (width: number, height: number, scale: number) =>{
   const maxSize = 96
 
-  const sizeBasedOnWidth = width * scale
-  const sizeBasedOnHeight = height * scale
+  const sizeWidth = width * scale
+  const sizeHeight = height * scale
 
-  const fontSize = Math.min(sizeBasedOnWidth, sizeBasedOnHeight, maxSize)
+  const fontSize = Math.min(sizeWidth, sizeHeight, maxSize)
 
   return fontSize
 }

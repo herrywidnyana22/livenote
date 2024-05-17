@@ -58,56 +58,45 @@ export enum LayerType{
     Note
 }
 
-export type RectangleLayer = {
-    type: LayerType.Rectangle
-    width: number
-    height: number
-    x: number
-    y: number
-    fill: Color
-    value?: string
+export type BaseLayer = {
+    type: LayerType;
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+    fill: Color;
+    value?: string;
+    textColor?: string;
+    textAlign?: TextAlign | "center"
+    textSize?: number
+    isBold?: boolean
+    isItalic?:boolean
+    isUnderline?: boolean
+    fontType?: string
 }
 
-export type CircleLayer = {
-    type: LayerType.Circle
-    width: number
-    height: number
-    x: number
-    y: number
-    fill: Color
-    value?: string
+export type RectangleLayer = BaseLayer & {
+    type: LayerType.Rectangle;
 }
 
-export type DrawingLayer = {
-    type: LayerType.Drawing
-    width: number
-    height: number
-    x: number
-    y: number
-    fill: Color
-    point: number[][]
-    value?: string
+export type CircleLayer = BaseLayer & {
+    type: LayerType.Circle;
 }
 
-export type TextLayer = {
-    type: LayerType.Text
-    width: number
-    height: number
-    x: number
-    y: number
-    fill: Color
-    value?: string
+export type DrawingLayer = BaseLayer & {
+    type: LayerType.Drawing;
+    point: number[][];
 }
 
-export type NoteLayer = {
-    type: LayerType.Note
-    width: number
-    height: number
-    x: number
-    y: number
-    fill: Color
-    value?: string
+export type TextLayer = BaseLayer & {
+    type: LayerType.Text;
 }
+
+export type NoteLayer = BaseLayer & {
+    type: LayerType.Note;
+}
+
+export type Layer = RectangleLayer | CircleLayer | DrawingLayer | TextLayer | NoteLayer
 
 export type Point = {
     x: number
@@ -135,4 +124,15 @@ export function mouseEventInCanvas(e: React.PointerEvent, angle: Angle){
     }
 }
 
-export type Layer = TextLayer | NoteLayer | RectangleLayer | CircleLayer | DrawingLayer
+export enum TextAlign {
+    alignLeft = "left",
+    alignRight = "right",
+    alignCenter = "center",
+    alignJustify = "justify",
+}
+
+export type fontApps = {
+    bold: boolean
+    italic: boolean
+    underline: boolean
+}
