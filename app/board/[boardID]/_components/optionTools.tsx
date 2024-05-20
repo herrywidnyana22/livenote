@@ -1,9 +1,9 @@
 'use client'
 
 import { cn, rgbToHex } from "@/lib/utils"
-import { LayerType, TextAlign, fontApps } from "@/types/canvasType"
+import { LayerType, TextAlign, FontApps } from "@/types/canvasType"
 import { Angle, Color } from "@/types/canvasType"
-import { memo, useState } from "react"
+import { memo, useEffect, useState } from "react"
 import { useDeleteLayer } from "@/hooks/useDeleteLayer"
 import { useSelectedResize } from "@/hooks/useSelectedResize"
 import { useMutation, useSelf, useStorage } from "@/liveblocks.config"
@@ -21,6 +21,7 @@ import {
     CaseUpper, 
     Italic, 
     Minus, 
+    PaintBucket, 
     Trash2, 
     Underline 
 } from "lucide-react"
@@ -40,17 +41,48 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { Info } from "@/components/info"
 import { ColorOptions } from "./colorOption"
 
+import fontFamilyData from '@/lib/fontLibrary.json'
+import fontSizeData from '@/lib/fontSize.json'
+
 interface OptionToolsProps{
     angle: Angle
-    setLastColor: (color: Color) => void
-    selectedColor: Color
+    setLastFontFamily: (font: string) => void
+    lastFontFamily: string
+    setLastFillColor: (color: Color) => void
+    lastFillColor: Color
+    setLastFontColor: (color: Color) => void
+    lastFontColor: Color
+    setLastBold: (isBold: boolean) => void
+    lastBold: boolean
+    setLastItalic: (isItalic: boolean) => void
+    lastItalic: boolean
+    setLastUnderline: (isUnderline: boolean) => void
+    lastUnderline: boolean
+    setLastAlignment: (align: TextAlign) => void
+    lastAlignment: TextAlign
+    setLastFontSize: (size: string) => void
+    lastFontSize: string
 }
 
 
 export const OptionTools = memo(({
-    angle, 
-    setLastColor,
-    selectedColor,
+    angle,
+    setLastFontFamily,
+    lastFontFamily,
+    setLastFillColor,
+    lastFillColor,
+    setLastFontColor,
+    lastFontColor,
+    setLastBold,
+    lastBold,
+    setLastItalic,
+    lastItalic,
+    setLastUnderline,
+    lastUnderline,
+    setLastAlignment,
+    lastAlignment,
+    setLastFontSize,
+    lastFontSize
 }: OptionToolsProps) => {
     
 
@@ -58,60 +90,147 @@ export const OptionTools = memo(({
     const allLayers = useStorage((home) => home.layers)
     const isMultiSelected = selectionID.length > 1
 
-
+    
     const layer = !isMultiSelected
         ? allLayers.get(selectionID[0])
         : null
+        
 
     const selectionResize = useSelectedResize()
-    const [position, setPosition] = useState("Bottom")
+
+    const defaultFillColor = layer && layer.fill ? layer.fill : lastFillColor
+    const defaultFontColor = layer && layer.textColor ? layer.textColor : lastFontColor
+    const defaultAlign = isMultiSelected ? lastAlignment : layer?.textAlign
+    const defaultFontSize = isMultiSelected ? lastFontSize : layer?.textSize
+
+    const defaultBold = isMultiSelected ? lastBold : layer?.isBold
+    const defaultItalic = isMultiSelected ? lastItalic : layer?.isItalic
+    const defaultUnderline = isMultiSelected ? lastUnderline : layer?.isUnderline
+
+    const defaultFontFamily = isMultiSelected ? lastFontFamily : layer?.fontFamily 
+    
+
+    const setFontSize= useMutation(({storage}, size: string) => {
+        const liveLayer = storage.get("layers")
+        setLastFontSize(size)
+
+        selectionID.forEach((id) => {
+            liveLayer.get(id)?.set("textSize", size)
+        })
+    }, [selectionID, defaultFontSize])
+
+    const increaseFontSize = useMutation(({storage}) => {
+        const currentFontSizeIndex = fontSizeData.findIndex(font => font.fontSize === defaultFontSize)
+        
+        if (currentFontSizeIndex < fontSizeData.length - 1) {
+            const increaseIndex = currentFontSizeIndex + 1
+            const increaseFontSize = fontSizeData[increaseIndex].fontSize
+            
+            const liveLayer = storage.get("layers")
+
+            selectionID.forEach((id) => {
+                liveLayer.get(id)?.set("textSize", increaseFontSize)
+            })
+
+            setLastFontSize(increaseFontSize)
+        }
+
+    },[selectionID, defaultFontSize])
+
+    const decreaseFontSize = useMutation(({storage}) => {
+        const currentFontSizeIndex = fontSizeData.findIndex(font => font.fontSize === defaultFontSize)
+
+        if (currentFontSizeIndex > 0) {
+            const decreaseIndex = currentFontSizeIndex - 1
+            const decreaseFontSize = fontSizeData[decreaseIndex].fontSize
+            
+            const liveLayer = storage.get("layers")
+
+            selectionID.forEach((id) => {
+                liveLayer.get(id)?.set("textSize", decreaseFontSize)
+            })
+
+            setLastFontSize(decreaseFontSize)
+        }
+
+    },[selectionID, defaultFontSize])
     
     const setFill = useMutation(({storage}, fill: Color) => {
         const liveLayer = storage.get("layers")
-        setLastColor(fill)
+        setLastFillColor(fill)
 
         selectionID.forEach((id) => {
             liveLayer.get(id)?.set("fill", fill)
         })
-    }, [selectionID, setLastColor])
+    }, [selectionID, defaultFillColor])
+
+    const setFontColor = useMutation(({storage}, color: Color) => {
+        const liveLayer = storage.get("layers")
+        setLastFontColor(color)
+
+        selectionID.forEach((id) => {
+            liveLayer.get(id)?.set("textColor", color)
+        })
+    }, [selectionID, defaultFontColor])
     
     const setAlignment = useMutation(({ storage }, align: TextAlign) => {
         const liveLayer = storage.get("layers")
+        setLastAlignment(align)
 
         selectionID.forEach((id) => {
             const layer = liveLayer.get(id)
             layer?.set("textAlign", align)
         })
-    }, [selectionID])
+    }, [selectionID, defaultAlign])
 
-    const setBold = useMutation(({ storage }, isBold: boolean) => {
+
+    const setFontFamily = useMutation(({storage}, font: string) => {
         const liveLayer = storage.get("layers")
+        setLastFontFamily(font)
 
         selectionID.forEach((id) => {
-            const layer = liveLayer.get(id)
-            layer?.set("isBold", isBold)
+            liveLayer.get(id)?.set("fontFamily", font)
         })
-    }, [selectionID])
+    }, [selectionID, defaultFontFamily])
 
-    const setItalic = useMutation(({ storage }, isItalic: boolean) => {
+    const setBold = useMutation(({ storage }, bold: boolean) => {
+        const isBold = isMultiSelected 
+            ? !lastBold
+            : bold   
+        
         const liveLayer = storage.get("layers")
+        selectionID.forEach((id) => {
+            liveLayer.get(id)?.set("isBold", isBold)
+        })
+        setLastBold(isBold)
+        
+    }, [selectionID, defaultBold])
+
+    const setItalic = useMutation(({ storage }, italic: boolean) => {
+        const isItalic = isMultiSelected 
+            ? !lastItalic
+            : italic  
+
+        const liveLayer = storage.get("layers")
+        setLastItalic(isItalic)
 
         selectionID.forEach((id) => {
-            const layer = liveLayer.get(id)
-            layer?.set("isItalic", isItalic)
+            liveLayer.get(id)?.set("isItalic", isItalic)
         })
-    }, [selectionID])
+    }, [selectionID, defaultItalic])
 
-    const setUnderline = useMutation(({ storage }, isUnderline: boolean) => {
+    const setUnderline = useMutation(({ storage }, underline: boolean) => {
+        const isUnderline = isMultiSelected 
+            ? !lastUnderline
+            : underline  
+
         const liveLayer = storage.get("layers")
+        setLastUnderline(isUnderline)
 
         selectionID.forEach((id) => {
-            const layer = liveLayer.get(id)
-            layer?.set("isUnderline", isUnderline)
+            liveLayer.get(id)?.set("isUnderline", isUnderline)
         })
-    }, [selectionID])
-
-    const deleteLayer = useDeleteLayer()
+    }, [selectionID, defaultUnderline])
 
     const moveToFrontLayer = useMutation(({storage}) => {
         const liveLayerIDData = storage.get("layerID")
@@ -150,6 +269,9 @@ export const OptionTools = memo(({
         }
 
     },[selectionID]) 
+
+
+    const deleteLayer = useDeleteLayer()
 
     if(!selectionResize) return
 
@@ -218,50 +340,123 @@ export const OptionTools = memo(({
                     border-neutral-200
                 "
             >
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <div>
-                            <Button 
-                                variant="outline"
+                <div className="flex gap-2">
+                    {/* FONT OPTION */}
+                    <div className="w-full">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <div>
+                                    <Button 
+                                        variant="outline"
+                                        className="
+                                            relative
+                                            w-full
+                                            flex
+                                            justify-between
+                                            items-center
+                                        "
+                                    >
+                                        <p style={{ fontFamily: defaultFontFamily }}>
+                                            {defaultFontFamily}
+                                        </p>
+                                        <ArrowDown 
+                                            className="
+                                                absolute
+                                                w-3 
+                                                h-3
+                                                right-2 
+                                                text-neutral-600"
+                                            />
+                                    </Button>
+                                    
+                                </div>
+                                
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56 max-h-64 overflow-y-auto">
+                                <DropdownMenuLabel>
+                                    Font Style
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuRadioGroup 
+                                    value={defaultFontFamily} 
+                                    onValueChange={setFontFamily}>
+                                    {
+                                        fontFamilyData.map((fontData, index) => (
+                                            <DropdownMenuRadioItem key={index} value={fontData.fontFamily}>
+                                                <p style={{
+                                                    fontFamily: fontData.fontFamily
+                                                }}>
+                                                        {fontData.fontFamily}
+                                                </p>
+                                            </DropdownMenuRadioItem>
+                                    ))
+                                    }
+                                </DropdownMenuRadioGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
+                    </div>
+
+                    {/* SIZE OPTION */}
+                    <div className="w-[20%]">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <div>
+                                    <Info label="Font size">
+                                        <Button 
+                                            variant="outline"
+                                            className="
+                                                flex
+                                                justify-between
+                                                items-center
+                                                px-2
+                                            "
+                                        >
+                                            <p>{parseInt(defaultFontSize!, 10)}</p>
+                                        </Button>
+                                    
+                                    </Info>
+                                </div>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent 
                                 className="
-                                    relative
-                                    w-full
-                                    flex
-                                    justify-between
-                                    items-center
-                                "
-                            >
-                                {position}
-                                <ArrowDown 
-                                    className="
-                                        absolute
-                                        w-3 
-                                        h-3
-                                        right-2 
-                                        text-neutral-600"
-                                    />
-                            </Button>
-                            
-                        </div>
-                        
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56">
-                        <DropdownMenuLabel>Font Style</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
-                            <DropdownMenuRadioItem value="Top">Top</DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value="Bottom">Bottom</DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value="Right">Right</DropdownMenuRadioItem>
-                        </DropdownMenuRadioGroup>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                                    w-5 
+                                    max-h-64 
+                                    overflow-y-auto"
+                                >
+                                <DropdownMenuLabel>
+                                    Font Size
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuRadioGroup 
+                                    value={defaultFontSize} 
+                                    onValueChange={setFontSize}>
+                                    {
+                                        fontSizeData.map((size, index) => (
+                                            <DropdownMenuRadioItem 
+                                                key={index} 
+                                                value={size.fontSize as string}
+                                            >
+                                                <p>{ size.fontSize }</p>
+                                            </DropdownMenuRadioItem>
+                                        ))
+                                    }
+                                </DropdownMenuRadioGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+
+
+                </div>
+
+                {/* FONT APPS */}
                 <div className="flex gap-2">
                     <div className="flex gap-1 items-center">
                         <Button
-                            onClick={() => setBold(layer && layer.isBold ? false : true)}
+                            onClick={() => setBold(!(layer && layer.isBold))}
                             variant={"ghost"}
                             className={cn(
-                                layer && layer.isBold
+                                defaultBold
                                 ? "bg-slate-100"
                                 : "bg-transparent"
                             )}
@@ -269,10 +464,10 @@ export const OptionTools = memo(({
                             <Bold className="h-4 w-4" />
                         </Button>
                         <Button
-                            onClick={() => setItalic(layer && layer.isItalic ? false : true)}
+                            onClick={() => setItalic(!(layer && layer.isItalic))}
                             variant={"ghost"}
                             className={cn(
-                                layer && layer.isItalic
+                                defaultItalic
                                 ? "bg-slate-100"
                                 : "bg-transparent"
                             )}
@@ -280,10 +475,10 @@ export const OptionTools = memo(({
                             <Italic className="h-4 w-4" />
                         </Button>
                         <Button
-                            onClick={() => setUnderline(layer && layer.isUnderline ? false : true)}
+                            onClick={() => setUnderline(!(layer && layer.isUnderline))}
                             variant={"ghost"}
                             className={cn(
-                                layer && layer.isUnderline
+                                defaultUnderline
                                 ? "bg-slate-100"
                                 : "bg-transparent"
                             )}
@@ -292,39 +487,99 @@ export const OptionTools = memo(({
                         </Button>
                     </div>
 
-                    {/* FONT OPTION */}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger>
-                            <Button
-                                variant={"ghost"}
-                                className="relative flex flex-col"
-                            >
-                                <CaseUpper 
-                                    
-                                    className="h-4 w-4 font-extrabold" 
-                                />
-                                <Minus 
-                                    style={{
-                                        color: selectedColor ? rgbToHex(selectedColor) : "#000"
-                                    }}
+                    <div className="flex gap-1">
+                        {/* FONT COLOR OPTION */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger>
+                                <Button
+                                    variant={"ghost"}
                                     className="
-                                        absolute 
-                                        h-4 
-                                        w-5 
-                                        font-extrabold 
-                                        bottom-1
-                                    " 
+                                        relative 
+                                        flex 
+                                        flex-col
+                                        px-2
+                                    "
+                                >
+                                    <CaseUpper 
+                                        className="
+                                            h-4 
+                                            w-4 
+                                            font-extrabold
+                                        " 
+                                    />
+                                    <Minus 
+                                        style={{
+                                            color: defaultFontColor ? rgbToHex(defaultFontColor) : "#000"
+                                        }}
+                                        className="
+                                            absolute 
+                                            w-full
+                                            h-4 
+                                            font-extrabold 
+                                            bottom-1
+                                        " 
+                                    />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent 
+                                side="top"
+                                className="background-none" 
+                            >
+                                <ColorOptions
+                                    onChange ={setFontColor}
+                                    selectedColor={defaultFontColor}
                                 />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <ColorOptions
-                                onChange ={setFill}
-                                selectedColor={selectedColor}
-                            />
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
 
+                        {/* BACKGROUND FILL OPTION */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger disabled={!isMultiSelected && (layer?.type !== LayerType.Text && layer?.type === LayerType.Drawing)}
+>
+                                <Button
+                                    variant={"ghost"}
+                                    className="
+                                        relative 
+                                        flex 
+                                        flex-col
+                                        items-center
+                                        justify-center
+                                        px-2
+                                    "
+                                    disabled={!isMultiSelected && (layer?.type !== LayerType.Text && layer?.type === LayerType.Drawing)}
+                                >
+                                    <PaintBucket 
+                                        className="
+                                            w-4 
+                                            h-3
+                                            font-extrabold
+                                        " 
+                                    />
+                                    <Minus 
+                                        style={{
+                                            color: defaultFillColor ? rgbToHex(defaultFillColor) : "transparent"
+                                        }}
+                                        className="
+                                            absolute 
+                                            w-full 
+                                            h-4 
+                                            font-extrabold 
+                                            bottom-1
+                                        " 
+                                    />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                                side="top" 
+                                className="background-none"
+                            >
+                                <ColorOptions
+                                    onChange ={setFill}
+                                    selectedColor={defaultFillColor}
+                                />
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
                 </div>
                    
                 
@@ -349,6 +604,7 @@ export const OptionTools = memo(({
                     <Info label="Increase font size">
                         <Button
                             variant={"ghost"}
+                            onClick={increaseFontSize}
                         >
                             <AArrowUp
                                 className="
@@ -359,9 +615,10 @@ export const OptionTools = memo(({
                         </Button>
 
                     </Info>
-                    <Info label="Decrease font size">
+                    <Info label="Decrease font size" side="bottom">
                         <Button
                             variant={"ghost"}
+                            onClick={decreaseFontSize}
                         >
                             <AArrowDown
                                 className="
@@ -376,7 +633,7 @@ export const OptionTools = memo(({
 
                 <ToggleGroup 
                     type="single"
-                    value={layer ? layer.textAlign : TextAlign.alignCenter} // Set the current selected value
+                    value={defaultAlign} 
                     onValueChange={setAlignment} 
                     className="
                         grid 
@@ -394,12 +651,12 @@ export const OptionTools = memo(({
                             <AlignRight className="h-4 w-4" />
                         </ToggleGroupItem>
                     </Info>
-                    <Info label="Align justify">
+                    <Info label="Align justify" side="bottom">
                         <ToggleGroupItem value={TextAlign.alignJustify} aria-label="Toggle justify">
                             <AlignJustify className="h-4 w-4" />
                         </ToggleGroupItem>
                     </Info>
-                    <Info label="Align center">
+                    <Info label="Align center" side="bottom">
                         <ToggleGroupItem value={TextAlign.alignCenter} aria-label="Toggle center">
                             <AlignCenter className="h-4 w-4" />
                         </ToggleGroupItem>

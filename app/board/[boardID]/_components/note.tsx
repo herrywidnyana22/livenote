@@ -26,14 +26,20 @@ export const Note = ({
     selectedColor,
     alignment
 }: NoteProps) => {
-
-    const {
+const {
         x,
         y,
         width,
         height,
+        value,
         fill,
-        value
+        textColor,
+        textAlign,
+        textSize,
+        isBold,
+        isItalic,
+        isUnderline,
+        fontFamily
     } = layer
 
     const updateValue = useMutation((
@@ -46,8 +52,8 @@ export const Note = ({
 
     },[])
 
-    const luminanceThreshold = 0.7
-    const textColor = fill ? (calculateBrightness(fill) > luminanceThreshold ? 'black' : 'white') : 'black'
+    // const luminanceThreshold = 0.7
+    // const default = fill ? (calculateBrightness(fill) > luminanceThreshold ? 'black' : 'white') : 'black'
 
     const handleEditText = (e:ContentEditableEvent) =>{
         updateValue(e.target.value)
@@ -73,17 +79,20 @@ export const Note = ({
                 html={value || "Text"}
                 onChange={handleEditText}
                 style={{
-                    fontSize: calculateFontSize(width, height, 0.15),
-                    color: textColor,
-                    textAlign: "center"
+                    color: textColor ? rgbToHex(textColor) :  "#000",
+                    textAlign: "center",
+                    fontWeight: isBold ? 'bold' : 'normal',
+                    fontStyle: isItalic ? 'italic' : 'normal',
+                    textDecoration: isUnderline ? 'underline' : 'none',
+                    fontFamily: fontFamily,
+                    fontSize: textSize
                 }}
                 className={cn(`
                     w-full
                     h-full
                     flex
-                    items-center
+                    p-2
                     outline-none`,
-                    font.className
                     
                 )}
             />      

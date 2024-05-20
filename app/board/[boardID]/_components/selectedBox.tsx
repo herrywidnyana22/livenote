@@ -14,6 +14,7 @@ const HANDLE_WIDTH = 8
 export const SelectedBox = memo(({
     onResize
 }: SelectedBoxProps) => {
+    
     const thisLayerID = useSelf((me) => 
         me.presence.select.length === 1
         ? me.presence.select[0]

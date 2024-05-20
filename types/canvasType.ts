@@ -66,13 +66,13 @@ export type BaseLayer = {
     y: number;
     fill: Color;
     value?: string;
-    textColor?: string;
+    textColor?: Color;
     textAlign?: TextAlign | "center"
-    textSize?: number
+    textSize?: string
     isBold?: boolean
     isItalic?:boolean
     isUnderline?: boolean
-    fontType?: string
+    fontFamily?: any
 }
 
 export type RectangleLayer = BaseLayer & {
@@ -131,7 +131,7 @@ export enum TextAlign {
     alignJustify = "justify",
 }
 
-export type fontApps = {
+export type FontApps = {
     bold: boolean
     italic: boolean
     underline: boolean

@@ -22,6 +22,18 @@ export function rgbToHex(color: Color){
   return `#${color.r.toString(16).padStart(2,"0")}${color.g.toString(16).padStart(2,"0")}${color.b.toString(16).padStart(2,"0")}`
 }
 
+export function hexToRgb(hexColor: string) {
+    // Remove the leading # if present
+    hexColor = hexColor.replace(/^#/, '');
+
+    // Parse the red, green, and blue components
+    const r = parseInt(hexColor.slice(0, 2), 16);
+    const g = parseInt(hexColor.slice(2, 4), 16);
+    const b = parseInt(hexColor.slice(4, 6), 16);
+
+    return { r, g, b };
+}
+
 export function resizing(
   resize: dimention,
   position: Side,

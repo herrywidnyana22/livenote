@@ -6,8 +6,26 @@ import { LiveObject } from "@liveblocks/core";
 import { useDisableScroll } from "@/hooks/useDisableScroll";
 import { KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useCanRedo, useCanUndo, useHistory, useMutation, useOthersMapped, useSelf, useStorage } from "@/liveblocks.config";
-import { cn, findIntersectingWithRectangle, memberOnlineColor, penPointToLayer, resizing, rgbToHex } from "@/lib/utils";
-import { Angle, CanvasMode, CanvasState, CircleLayer, Color, DrawingLayer, Layer, LayerType, NoteLayer, Point, RectangleLayer, Side, TextAlign, TextLayer, dimention, mouseEventInCanvas } from "@/types/canvasType";
+import { cn, findIntersectingWithRectangle, hexToRgb, memberOnlineColor, penPointToLayer, resizing, rgbToHex } from "@/lib/utils";
+import { 
+    Angle, 
+    CanvasMode, 
+    CanvasState, 
+    CircleLayer, 
+    Color, 
+    DrawingLayer,
+    FontApps, 
+    Layer, 
+    LayerType, 
+    NoteLayer, 
+    Point, 
+    RectangleLayer, 
+    Side, 
+    TextAlign, 
+    TextLayer, 
+    dimention, 
+    mouseEventInCanvas 
+} from "@/types/canvasType";
 
 import { Member } from "./member";
 import { Drawing } from "./drawing";
@@ -31,13 +49,19 @@ const Canvas = ({
     const [canvasState, setCanvasState] = useState<CanvasState>({
         mode: CanvasMode.None
     })
+    // DEFAULT COLOR
+    const currentUser = useSelf()
 
+    const defaultColor = memberOnlineColor(currentUser.connectionId)
 
-    const [lastColor, setLastColor] = useState<Color>({
-        r: 171,
-        g: 184,
-        b: 195
-    })
+    const [lastFillColor, setLastFillColor] = useState<Color>(hexToRgb(defaultColor))
+    const [lastFontColor, setLastFontColor] = useState<Color>(hexToRgb(defaultColor))
+    const [lastFontFamily, setlastFontFamily] = useState<string>("Arial")
+    const [lastAlignment, setLastAlignment] = useState<TextAlign>(TextAlign.alignCenter)
+    const [lastBold, setLastBold] = useState<boolean>(false)
+    const [lastItalic, setLastItalic] = useState<boolean>(false)
+    const [lastUnderline, setLastUnderline] = useState<boolean>(false)
+    const [LastFontSize, setLastFontSize] = useState<string>("24px")
 
     const [angle, setAngle] = useState<Angle>({
         x: 0,
@@ -51,10 +75,7 @@ const Canvas = ({
     
     useDisableScroll()
     
-    // DEFAULT COLOR
-    const currentUser = useSelf()
-    const defaultColor = memberOnlineColor(currentUser.connectionId)
-
+    
      // LAYERING
     const layerIDS = useStorage((root) => root.layerID)
     const pencilTool = useSelf((me) => me.presence.pencilDraw)
@@ -74,42 +95,52 @@ const Canvas = ({
         const liveLayerID = storage.get("layerID");
         const layerID = nanoid();
         const baseLayerProps = {
-            width: 100,
-            height: 100,
             x: position.x,
             y: position.y,
-            fill: lastColor,
+            fill: lastFillColor,
             textAlign: "center" as TextAlign | "center",
-            textColor: defaultColor,
+            textColor: lastFontColor,
             isBold: false,
             isItalic: false,
-            isUnderline: false
+            isUnderline: false,
+            fontFamily: "Arial",
+            textSize: "24px"
         }
 
         let layer: LiveObject<Layer>;
         if (layerType === LayerType.Text) {
             layer = new LiveObject<TextLayer>({
                 ...baseLayerProps,
+                height: 40,
+                width: 200,
                 type: LayerType.Text
             })
         } else if (layerType === LayerType.Note) {
             layer = new LiveObject<NoteLayer>({
                 ...baseLayerProps,
+                height: 100,
+                width: 200,
                 type: LayerType.Note
             })
         } else if (layerType === LayerType.Rectangle) {
             layer = new LiveObject<RectangleLayer>({
                 ...baseLayerProps,
+                height: 100,
+                width: 100,
                 type: LayerType.Rectangle
             })
         } else if (layerType === LayerType.Circle) {
             layer = new LiveObject<CircleLayer>({
                 ...baseLayerProps,
+                height: 100,
+                width: 100,
                 type: LayerType.Circle
             })
         } else {
             layer = new LiveObject<DrawingLayer>({
                 ...baseLayerProps,
+                height: 100,
+                width: 100,
                 type: LayerType.Drawing,
                 point: []
             })
@@ -119,7 +150,7 @@ const Canvas = ({
         liveLayer.set(layerID, layer);
 
         setMyPresence({ select: [layerID] }, { addToHistory: true });
-    }, [lastColor]);
+    }, [lastFillColor, lastFontColor]);
 
     
     const updateMultiSelected = useMutation((
@@ -162,9 +193,9 @@ const Canvas = ({
     ) => {
        setMyPresence({
         pencilDraw: [[point.x, point.y, pressure]],
-        penColor: lastColor
+        penColor: lastFillColor
        }) 
-    },[lastColor])
+    },[lastFillColor])
 
     const onDrawing = useMutation((
         { setMyPresence, self },
@@ -213,7 +244,7 @@ const Canvas = ({
 
         liveLayerData.set(
             id,
-            new LiveObject(penPointToLayer(pencilDraw, lastColor))
+            new LiveObject(penPointToLayer(pencilDraw, lastFillColor))
         )
         liveLayerIDData.push(id)
 
@@ -221,7 +252,7 @@ const Canvas = ({
         setCanvasState({mode: CanvasMode.Pencil})
 
         
-    },[lastColor])
+    },[lastFillColor])
 
     const unSelectLayer = useMutation(({ self, setMyPresence })  => {
         if(self.presence.select.length > 0){
@@ -380,21 +411,33 @@ const Canvas = ({
     ])
 
     const onMousePress = useCallback((e: React.PointerEvent) =>{
-        const point = mouseEventInCanvas(e, angle)
-
-        if(canvasState.mode === CanvasMode.Insert){
-            return
-        }
         
-        if(canvasState.mode === CanvasMode.Pencil){
-            startDrawing(point, e.pressure)
+        if (e.button === 0) {
+            const point = mouseEventInCanvas(e, angle)
+
+            if(canvasState.mode === CanvasMode.Insert){
+                return
+            }
+            
+            if(canvasState.mode === CanvasMode.Pencil){
+                startDrawing(point, e.pressure)
+                return
+            }
+
+            setCanvasState({
+                origin: point,
+                mode: CanvasMode.Press
+            })  
+        } else if (e.button === 2) {
+            const point = mouseEventInCanvas(e, angle)
+            setCanvasState({
+                origin: point,
+                mode: CanvasMode.Select
+            }) 
+        } else {
             return
         }
-
-        setCanvasState({
-            origin: point,
-            mode: CanvasMode.Press
-        })
+       
     },[canvasState, angle, startDrawing])
 
     const onMouseSelectItem = useMutation((
@@ -406,22 +449,34 @@ const Canvas = ({
             return
         }
 
-        history.pause()
-        e.stopPropagation()
+        
+        if (e.button === 0) {
+            history.pause()
+            e.stopPropagation()
 
-        const point = mouseEventInCanvas(e, angle)
+            const point = mouseEventInCanvas(e, angle)
+            
+            if(!self.presence.select.includes(layerID)){
+                setMyPresence(
+                    { select: [layerID] },
+                    { addToHistory: true }
+                )
+            }
 
-        if(!self.presence.select.includes(layerID)){
-            setMyPresence(
-                { select: [layerID] },
-                { addToHistory: true }
-            )
+            setCanvasState({
+                mode: CanvasMode.Move,
+                current: point
+            })
+
+        } else if (e.button === 2) {
+            const point = mouseEventInCanvas(e, angle)
+            setCanvasState({
+                origin: point,
+                mode: CanvasMode.Select
+            }) 
+        } else {
+            return
         }
-
-        setCanvasState({
-            mode: CanvasMode.Move,
-            current: point
-        })
 
     },[setCanvasState, angle, history, canvasState.mode])
 
@@ -499,8 +554,23 @@ const Canvas = ({
             />
             <OptionTools
                 angle={angle}
-                setLastColor={setLastColor}
-                selectedColor={lastColor}
+                setLastFontFamily={setlastFontFamily}
+                lastFontFamily={lastFontFamily}
+                setLastFillColor={setLastFillColor}
+                lastFillColor={lastFillColor}
+                setLastFontColor={setLastFontColor}
+                lastFontColor={lastFontColor}
+                setLastBold={setLastBold}
+                lastBold ={lastBold}
+                setLastItalic={setLastItalic}
+                lastItalic = {lastItalic}
+                setLastUnderline={setLastUnderline}
+                lastUnderline = {lastUnderline}
+                setLastAlignment={setLastAlignment}
+                lastAlignment = {lastAlignment}
+                setLastFontSize={setLastFontSize}
+                lastFontSize={LastFontSize}
+                
             />
             <svg
                 onPointerMove={onMouseMove}
@@ -514,6 +584,7 @@ const Canvas = ({
                     canvasState.mode === CanvasMode.Move
                     && "cursor-grabbing"
                 )}
+                onContextMenu={(e) => e.preventDefault()}
             >
                 <g
                     style={{
@@ -562,7 +633,7 @@ const Canvas = ({
                         && (
                             <Drawing
                                 point={pencilTool}
-                                fill={rgbToHex(lastColor)}
+                                fill={rgbToHex(lastFillColor)}
                                 x={0}
                                 y={0}
                             />

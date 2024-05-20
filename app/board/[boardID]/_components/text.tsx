@@ -5,12 +5,14 @@ import ContentEditable, { ContentEditableEvent } from "react-contenteditable"
 import { Kalam } from "next/font/google"
 import { TextLayer } from "@/types/canvasType"
 import { useMutation } from "@/liveblocks.config"
-import { calculateFontSize, cn, rgbToHex } from "@/lib/utils"
+import { cn, rgbToHex } from "@/lib/utils"
+
 
 const font = Kalam({
     subsets: ["latin"],
     weight: ["400"]
 })
+
 
 type TextProps = {
     id: string
@@ -30,7 +32,6 @@ export const Text = ({
         y,
         width,
         height,
-        fill,
         value,
         textColor,
         textAlign,
@@ -38,7 +39,7 @@ export const Text = ({
         isBold,
         isItalic,
         isUnderline,
-        fontType
+        fontFamily
     } = layer
 
     const updateValue = useMutation((
@@ -70,21 +71,21 @@ export const Text = ({
                 html={value || "Text"}
                 onChange={handleEditText}
                 style={{
-                    fontSize: calculateFontSize(width, height, 0.5),
-                    color: fill ? rgbToHex(fill) :  "#000",
+                    color: textColor ? rgbToHex(textColor) :  "#000",
                     textAlign: textAlign,
                     fontWeight: isBold ? 'bold' : 'normal',
                     fontStyle: isItalic ? 'italic' : 'normal',
-                    textDecoration: isUnderline ? 'underline' : 'none'
+                    textDecoration: isUnderline ? 'underline' : 'none',
+                    fontFamily: fontFamily,
+                    fontSize: textSize
                 }}
                 className={cn(`
                     w-full
                     h-full
                     drop=shadow-md`,
-                    // font.className
                     
                 )}
-            />      
+            />     
         </foreignObject>
     );
 }
