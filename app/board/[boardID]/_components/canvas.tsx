@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { nanoid } from "nanoid"
 import { LiveObject } from "@liveblocks/core";
 import { useDisableScroll } from "@/hooks/useDisableScroll";
-import { KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCanRedo, useCanUndo, useHistory, useMutation, useOthersMapped, useSelf, useStorage } from "@/liveblocks.config";
 import { cn, findIntersectingWithRectangle, hexToRgb, memberOnlineColor, penPointToLayer, resizing, rgbToHex } from "@/lib/utils";
 import { 
@@ -14,7 +14,6 @@ import {
     CircleLayer, 
     Color, 
     DrawingLayer,
-    FontApps, 
     Layer, 
     LayerType, 
     NoteLayer, 
